@@ -14,6 +14,7 @@
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
+
 #include <sys/stat.h>
 #include <sys/time.h>
 
@@ -32,3 +33,18 @@
 #else
   #define ISDEF_PLOT_PNG 0
 #endif
+
+/**
+ * Name: main
+ *
+ * Description:
+ * See usage statement (run program with '-h' flag).
+ *
+ * Parameters:
+ * @param argc    number of command line arguments
+ * @param argv    command line arguments
+*/
+int main( int argc, char **argv )
+{
+	return 0;
+}
