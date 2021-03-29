@@ -6,6 +6,7 @@
   This is a Hodgkin Huxley (HH) simplified compartamental neuron model 
 */
 
+#include "mpi.h"
 #include "plot.h"
 #include "lib_hh.h"
 #include "cmd_args.h"
