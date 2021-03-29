@@ -66,6 +66,10 @@ int main( int argc, char **argv )
  */
 void master(void)
 {
+    for (t_ms = 1; t_ms < COMPTIME; t_ms++) 
+    {
+
+    }
 	return;
 }
 
@@ -182,6 +186,10 @@ int main( int argc, char **argv )
     fclose(graph_file);
     }
 
+    //////////////////////////////////////////////////////////////////////////////
+    // Main Computation
+    //////////////////////////////////////////////////////////////////////////////
+
     // Initialize MPI and MPI Variables
     MPI_Init(&argc, &argv);
 
@@ -202,9 +210,67 @@ int main( int argc, char **argv )
 
     MPI_Finalize();
 
-    // Original Code Below
+    //////////////////////////////////////////////////////////////////////////////
+    // Report results of computation.
+    //////////////////////////////////////////////////////////////////////////////
+
+    // Stop the clock, compute how long the program was running and report that
+    // time.
+    gettimeofday( &stop, NULL );
+    timersub( &stop, &start, &diff );
+    exec_time = (double) (diff.tv_sec) + (double) (diff.tv_usec) * 0.000001;
+    printf("\n\nExecution time: %f seconds.\n", exec_time);
+
+    // Record the parameters for this simulation as well as data for gnuplot.
+    fprintf( data_file,
+           "# Vm for HH model. "
+           "Simulation time: %d ms, Integration step: %f ms, "
+           "Compartments: %d, Dendrites: %d, Execution time: %f s, "
+           "Slave processes: %d\n",
+           COMPTIME, soma_params[0], num_comps - 2, num_dendrs, exec_time,
+           0 );
+    fprintf( data_file, "# X Y\n");
+
+    for (t_ms = 0; t_ms < COMPTIME; t_ms++) {
+        fprintf(data_file, "%d %f\n", t_ms, res[t_ms]);
+    }
+    fflush(data_file);  // Flush and close the data file so that gnuplot will
+    fclose(data_file);  // see it.
+
+    //////////////////////////////////////////////////////////////////////////////
+    // Plot results if approriate macro was defined.
+    //////////////////////////////////////////////////////////////////////////////
+    if (ISDEF_PLOT_PNG || ISDEF_PLOT_SCREEN) {
+    pinfo.sim_time = COMPTIME;
+    pinfo.int_step = soma_params[0];
+    pinfo.num_comps = num_comps - 2;
+    pinfo.num_dendrs = num_dendrs;
+    pinfo.exec_time = exec_time;
+    pinfo.slaves = 0;
+    }
+
+    if (ISDEF_PLOT_PNG) {    plotData( &pinfo, data_fname, graph_fname ); }
+    if (ISDEF_PLOT_SCREEN) { plotData( &pinfo, data_fname, NULL ); }
+
+    //////////////////////////////////////////////////////////////////////////////
+    // Free up allocated memory.
+    //////////////////////////////////////////////////////////////////////////////
+
+    for(i = 0; i < num_dendrs; i++) {
+    free(dendr_volt[i]);
+    }
+    free(dendr_volt);
+
+    return 0;
+
+
+
+
+
 
     
+
+    // Original Code Below (To be put inside the master/slave block)
 
     //////////////////////////////////////////////////////////////////////////////
     // Initialize simulation parameters.
@@ -283,56 +349,5 @@ int main( int argc, char **argv )
         res[t_ms] = y[0];
     }
 
-    //////////////////////////////////////////////////////////////////////////////
-    // Report results of computation.
-    //////////////////////////////////////////////////////////////////////////////
-
-    // Stop the clock, compute how long the program was running and report that
-    // time.
-    gettimeofday( &stop, NULL );
-    timersub( &stop, &start, &diff );
-    exec_time = (double) (diff.tv_sec) + (double) (diff.tv_usec) * 0.000001;
-    printf("\n\nExecution time: %f seconds.\n", exec_time);
-
-    // Record the parameters for this simulation as well as data for gnuplot.
-    fprintf( data_file,
-    	   "# Vm for HH model. "
-    	   "Simulation time: %d ms, Integration step: %f ms, "
-    	   "Compartments: %d, Dendrites: %d, Execution time: %f s, "
-    	   "Slave processes: %d\n",
-    	   COMPTIME, soma_params[0], num_comps - 2, num_dendrs, exec_time,
-    	   0 );
-    fprintf( data_file, "# X Y\n");
-
-    for (t_ms = 0; t_ms < COMPTIME; t_ms++) {
-        fprintf(data_file, "%d %f\n", t_ms, res[t_ms]);
-    }
-    fflush(data_file);  // Flush and close the data file so that gnuplot will
-    fclose(data_file);  // see it.
-
-    //////////////////////////////////////////////////////////////////////////////
-    // Plot results if approriate macro was defined.
-    //////////////////////////////////////////////////////////////////////////////
-    if (ISDEF_PLOT_PNG || ISDEF_PLOT_SCREEN) {
-    pinfo.sim_time = COMPTIME;
-    pinfo.int_step = soma_params[0];
-    pinfo.num_comps = num_comps - 2;
-    pinfo.num_dendrs = num_dendrs;
-    pinfo.exec_time = exec_time;
-    pinfo.slaves = 0;
-    }
-
-    if (ISDEF_PLOT_PNG) {    plotData( &pinfo, data_fname, graph_fname ); }
-    if (ISDEF_PLOT_SCREEN) { plotData( &pinfo, data_fname, NULL ); }
-
-    //////////////////////////////////////////////////////////////////////////////
-    // Free up allocated memory.
-    //////////////////////////////////////////////////////////////////////////////
-
-    for(i = 0; i < num_dendrs; i++) {
-    free(dendr_volt[i]);
-    }
-    free(dendr_volt);
-
-    return 0;
+    
 }
