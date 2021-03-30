@@ -57,6 +57,10 @@ void master(void)
         {
             soma_params[2] = 0.0;
 
+            for(dendrite = 0; dendrite < num_dendrs; dendrite++) 
+            {
+                
+            }
             // Store previous HH model parameters.
             y0[0] = y[0]; y0[1] = y[1]; y0[2] = y[2]; y0[3] = y[3];
 
