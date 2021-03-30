@@ -156,6 +156,49 @@ int main( int argc, char **argv )
     }
 
     //////////////////////////////////////////////////////////////////////////////
+    // Initialize simulation parameters.
+    //////////////////////////////////////////////////////////////////////////////
+
+    // The first compartment is a dummy and the last is connected to the soma.
+    num_comps = num_comps + 2;
+
+    // Initialize 'y' with precomputed values from the HH model.
+    y[0] = VREST;
+    y[1] = 0.037;
+    y[2] = 0.0148;
+    y[3] = 0.9959;
+
+    // Setup parameters for the soma.
+    soma_params[0] = 1.0 / (double) STEPS;  // dt
+    soma_params[1] = 0.0;  // Direct current injection into soma is always zero.
+    soma_params[2] = 0.0;  // Dendritic current injected into soma. This is the
+                           // value that our simulation will update at each step.
+
+    printf( "\nIntegration step dt = %f\n", soma_params[0]);
+
+    // Start the clock.
+    gettimeofday( &start, NULL );
+
+    // Initialize the potential of each dendrite compartment to the rest voltage.
+    dendr_volt = (double**) malloc( num_dendrs * sizeof(double*) );
+    if(dendr_volt == NULL)
+    {
+        return;
+    }
+    for (i = 0; i < num_dendrs; i++) 
+    {
+        dendr_volt[i] = (double*) malloc( num_comps * sizeof(double) );
+        if(dendr_volt[i] == NULL)
+        {
+            return;
+        }
+        for (j = 0; j < num_comps; j++) 
+        {
+            dendr_volt[i][j] = VREST;
+        }
+    }
+
+    //////////////////////////////////////////////////////////////////////////////
     // Main Computation
     //////////////////////////////////////////////////////////////////////////////
 
