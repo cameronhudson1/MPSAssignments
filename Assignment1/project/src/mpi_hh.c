@@ -261,7 +261,7 @@ int main( int argc, char **argv )
                         } 
 
                         // Get all the dendrite processing info back
-                        for(int node = 1; node < (num_dendrs - (2*dendrite + worldsize - 1)); node++)
+                        for(int node = 1; node < (num_dendrs - (2*dendrite + world_size - 1)); node++)
                         {
                         	double current_c;
                         	MPI_Recv(&current_c, 1, MPI_DOUBLE, node, MPI_ANY_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
