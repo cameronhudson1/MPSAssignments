@@ -50,20 +50,24 @@
  */
 void master(int num_dendrs, int world_size)
 {
-    int t_ms;
+    // Loop over ms
     for (int t_ms = 1; t_ms < COMPTIME; t_ms++) 
     {
+        // Loop over steps
         for (int step = 0; step < STEPS; step++) 
         {
             soma_params[2] = 0.0;
 
-            for(int dendrite = 0; dendrite < num_dendrs; dendrite+=world_size) 
+            // Loop over dendrites
+            for(int dendrite = 0; dendrite < num_dendrs; dendrite += world_size) 
             {
+                // Put a dendrite on each processing node available
                 for(int nodes = 0; nodes < world_size; nodes++)
                 {
 
                 } 
             }
+
             // Store previous HH model parameters.
             y0[0] = y[0]; y0[1] = y[1]; y0[2] = y[2]; y0[3] = y[3];
 
