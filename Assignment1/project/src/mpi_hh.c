@@ -44,11 +44,12 @@
 
 typedef struct
 {
-    double *voltage;
+    int dendr;
     int step;
     int num_comps;
     double somaparams[3];
     double y[NUMVAR];
+    uint8_t done;
 } comm_buffer_t;
 
 
@@ -200,7 +201,8 @@ int main( int argc, char **argv )
     else
     {
         comm_buffer_t commbuf;
-        MPI_Recv(&commbuf, sizeof(comm_buffer_t), MPI_CHAR)
+        MPI_Recv(&commbuf, sizeof(comm_buffer_t), MPI_CHAR, 0, MPI_ANY_TAG, MPI_COMM_WORLD);
+
         // This will update Vm in all compartments and will give a new injected
         // current value from last compartment into the soma.
         current = dendriteStep( dendr_volt[ dendrite ],
