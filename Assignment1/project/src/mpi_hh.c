@@ -52,10 +52,10 @@
  * @param argc    number of command line arguments
  * @param argv    command line arguments
 */
-int main( int argc, char **argv )
-{
+//int main( int argc, char **argv )
+//{
 
-}
+//}
 
 
 /**
@@ -66,6 +66,7 @@ int main( int argc, char **argv )
  */
 void master(void)
 {
+    int t_ms;
     for (t_ms = 1; t_ms < COMPTIME; t_ms++) 
     {
 
