@@ -289,8 +289,8 @@ int main( int argc, char **argv )
     // Free up allocated memory.
     //////////////////////////////////////////////////////////////////////////////
 
-    for(i = 0; i < num_dendrs; i++) {
-    free(dendr_volt[i]);
+    for(int i = 0; i < num_dendrs; i++) {
+        free(dendr_volt[i]);
     }
     free(dendr_volt);
 
