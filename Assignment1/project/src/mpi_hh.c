@@ -179,12 +179,12 @@ int main( int argc, char **argv )
             soma_params[2] = 0.0;
 
             // Loop over dendrites
-            for(int dendrite = 0; dendrite < num_dendrs; dendrite += world_size) 
+            for(int dendrite = 0; dendrite < num_dendrs; dendrite += (world_size - 1))
             {
                 // Put a dendrite on each processing node available
                 for(int nodes = 1; nodes < world_size; nodes++)
                 {
-			
+			         
                 } 
             }
 
