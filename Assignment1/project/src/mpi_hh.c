@@ -176,11 +176,11 @@ int main( int argc, char **argv )
             // Loop over steps
             for (int step = 0; step < STEPS; step++) 
             {
-                soma_params[2] = 0.0;
-
+                soma_params[2] = 0.0; 
                 // Loop over dendrites
                 for(int dendrite = 0; dendrite < num_dendrs; dendrite += (world_size - 1))
                 {
+
                     // Put a dendrite on each processing node available
                     for(int node = 1; node < world_size; node++)
                     {
@@ -201,6 +201,13 @@ int main( int argc, char **argv )
                         MPI_Recv(&current_c, 1, MPI_DOUBLE, node, MPI_ANY_TAG, MPI_COMM_WORLD);
                         soma_params[2] += current_c;
                     }
+
+
+			if (dendrite + world_size - 1 < num_denders)
+			{
+				
+			}
+
                 }
 
                 // Tell all processing nodes that work is done
