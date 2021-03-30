@@ -71,9 +71,9 @@ void master(int num_dendrs, int world_size)
             for(int dendrite = 0; dendrite < num_dendrs; dendrite += world_size) 
             {
                 // Put a dendrite on each processing node available
-                for(int nodes = 0; nodes < world_size; nodes++)
+                for(int nodes = 1; nodes < world_size; nodes++)
                 {
-
+			
                 } 
             }
 
