@@ -248,7 +248,7 @@ int main( int argc, char **argv )
 
                     if ((dendrite + world_size - 1) < num_dendrs && (dendrite + world_size - 1) != 0)
 			         {
-                        for(int node = 1; node < (num_dendrs - (2*dendrite + worldsize - 1)); node++)
+                        for(int node = 1; node < (num_dendrs - (2*dendrite + world_size - 1)); node++)
                         {
                         	comm_buffer_t commbuf;
                         	commbuf.dendr = dendrite + node - 1;
