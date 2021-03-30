@@ -170,56 +170,56 @@ int main( int argc, char **argv )
 
     if(world_rank == 0)
     {
-    // Loop over ms
-    for (int t_ms = 1; t_ms < COMPTIME; t_ms++) 
-    {
-        // Loop over steps
-        for (int step = 0; step < STEPS; step++) 
+        // Loop over ms
+        for (int t_ms = 1; t_ms < COMPTIME; t_ms++) 
         {
-            soma_params[2] = 0.0;
-
-            // Loop over dendrites
-            for(int dendrite = 0; dendrite < num_dendrs; dendrite += (world_size - 1))
+            // Loop over steps
+            for (int step = 0; step < STEPS; step++) 
             {
-                // Put a dendrite on each processing node available
+                soma_params[2] = 0.0;
+
+                // Loop over dendrites
+                for(int dendrite = 0; dendrite < num_dendrs; dendrite += (world_size - 1))
+                {
+                    // Put a dendrite on each processing node available
+                    for(int node = 1; node < world_size; node++)
+                    {
+                        comm_buffer_t commbuf;
+                        commbuf.dendr = dendr + node - 1;
+                        commbuf.step = step;
+                        commbuf.num_comps = num_comps;
+                        commbuf.delta_t = somaparams[0];
+                        commbuf.v_m = y[0];
+                        commbuf.done = 0;
+    		            MPI_Send(&commbuf, sizeof(comm_buffer_t), MPI_CHAR, node, MPI_ANY_TAG, MPI_COMM_WORLD);
+                    } 
+
+                    // Get all the dendrite processing info back
+                    for(int node = 1; node < world_size; node++)
+                    {
+                        double current_c;
+                        MPI_Recv(&current_c, 1, MPI_DOUBLE, node, MPI_ANY_TAG, MPI_COMM_WORLD);
+                        soma_params[2] += current_c;
+                    }
+                }
+
+                // Tell all processing nodes that work is done
                 for(int node = 1; node < world_size; node++)
                 {
                     comm_buffer_t commbuf;
-                    commbuf.dendr = dendr + node - 1;
-                    commbuf.step = step;
-                    commbuf.num_comps = num_comps;
-                    commbuf.delta_t = somaparams[0];
-                    commbuf.v_m = y[0];
-                    commbuf.done = 0;
-		            MPI_Send(&commbuf, sizeof(comm_buffer_t), MPI_CHAR, node, MPI_ANY_TAG, MPI_COMM_WORLD);
+                    commbuf.done = 1;
+                    MPI_Send(&commbuf, sizeof(comm_buffer_t), MPI_CHAR, node, MPI_ANY_TAG, MPI_COMM_WORLD);
                 } 
 
-                // Get all the dendrite processing info back
-                for(int node = 1; node < world_size; node++)
-                {
-                    double current_c;
-                    MPI_Recv(&current_c, 1, MPI_DOUBLE, node, MPI_ANY_TAG, MPI_COMM_WORLD);
-                    soma_params[2] += current_c;
-                }
+                // Store previous HH model parameters.
+                y0[0] = y[0]; y0[1] = y[1]; y0[2] = y[2]; y0[3] = y[3];
+
+                // This is the main HH computation. It updates the potential, Vm, of the
+                // soma, injects current, and calculates action potential. Good stuff.
+                soma(dydt, y, soma_params);
+                rk4Step(y, y0, dydt, NUMVAR, soma_params, 1, soma);
             }
-
-            // Tell all processing nodes that work is done
-            for(int node = 1; node < world_size; node++)
-            {
-                comm_buffer_t commbuf;
-                commbuf.done = 1;
-                MPI_Send(&commbuf, sizeof(comm_buffer_t), MPI_CHAR, node, MPI_ANY_TAG, MPI_COMM_WORLD);
-            } 
-
-            // Store previous HH model parameters.
-            y0[0] = y[0]; y0[1] = y[1]; y0[2] = y[2]; y0[3] = y[3];
-
-            // This is the main HH computation. It updates the potential, Vm, of the
-            // soma, injects current, and calculates action potential. Good stuff.
-            soma(dydt, y, soma_params);
-            rk4Step(y, y0, dydt, NUMVAR, soma_params, 1, soma);
         }
-    }
     }
     else
     {
