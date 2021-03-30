@@ -42,6 +42,15 @@
   #define ISDEF_PLOT_PNG 0
 #endif
 
+typedef struct
+{
+    double voltage;
+    int step;
+    int num_comps;
+    double somaparams[3];
+    double y[NUMVAR];
+} comm_buffer_t;
+
 /**
  * Name: Master
  *
@@ -88,6 +97,7 @@ void master(int num_dendrs, int world_size)
  */
 void slave(void)
 {
+
     // This will update Vm in all compartments and will give a new injected
     // current value from last compartment into the soma.
     current = dendriteStep( dendr_volt[ dendrite ],
