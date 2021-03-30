@@ -264,7 +264,7 @@ int main( int argc, char **argv )
            0 );
     fprintf( data_file, "# X Y\n");
 
-    for (t_ms = 0; t_ms < COMPTIME; t_ms++) {
+    for (int t_ms = 0; t_ms < COMPTIME; t_ms++) {
         fprintf(data_file, "%d %f\n", t_ms, res[t_ms]);
     }
     fflush(data_file);  // Flush and close the data file so that gnuplot will
