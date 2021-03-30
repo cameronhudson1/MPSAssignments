@@ -246,9 +246,9 @@ int main( int argc, char **argv )
                     }
 
 
-                    if (dendrite + world_size - 1 < num_dendrs)
+                    if ((dendrite + world_size - 1) < num_dendrs && (dendrite + world_size - 1) != 0)
 			         {
-                        for(int node = 1; node < world_size; node++)
+                        for(int node = 1; node < (num_denders - (2*denrite + worldsize - 1)); node++)
                         {
                         	comm_buffer_t commbuf;
                         	commbuf.dendr = dendrite + node - 1;
@@ -261,7 +261,7 @@ int main( int argc, char **argv )
                         } 
 
                         // Get all the dendrite processing info back
-                        for(int node = 1; node < world_size; node++)
+                        for(int node = 1; node < (num_denders - (2*denrite + worldsize - 1)); node++)
                         {
                         	double current_c;
                         	MPI_Recv(&current_c, 1, MPI_DOUBLE, node, MPI_ANY_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
