@@ -94,8 +94,8 @@ int main( int argc, char **argv )
     //////////////////////////////////////////////////////////////////////////////
 
     if (!parseArgs( &cmd_args, argc, argv )) {
-    // Something was wrong.
-    exit(1);
+        // Something was wrong.
+        exit(1);
     }
 
     // Pull out the parameters so we don't need to type 'cmd_args.' all the time.
@@ -267,6 +267,8 @@ int main( int argc, char **argv )
                         	MPI_Recv(&current_c, 1, MPI_DOUBLE, node, MPI_ANY_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
                         	soma_params[2] += current_c;
                         }
+
+                        break;
                     }
                 }
 
