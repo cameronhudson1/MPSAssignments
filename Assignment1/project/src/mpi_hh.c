@@ -183,16 +183,16 @@ int main( int argc, char **argv )
     dendr_volt = (double**) malloc( num_dendrs * sizeof(double*) );
     if(dendr_volt == NULL)
     {
-        return;
+        return -1;
     }
-    for (i = 0; i < num_dendrs; i++) 
+    for (int i = 0; i < num_dendrs; i++) 
     {
         dendr_volt[i] = (double*) malloc( num_comps * sizeof(double) );
         if(dendr_volt[i] == NULL)
         {
-            return;
+            return -1;
         }
-        for (j = 0; j < num_comps; j++) 
+        for (int j = 0; j < num_comps; j++) 
         {
             dendr_volt[i][j] = VREST;
         }
