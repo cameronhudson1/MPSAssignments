@@ -182,9 +182,15 @@ int main( int argc, char **argv )
             for(int dendrite = 0; dendrite < num_dendrs; dendrite += (world_size - 1))
             {
                 // Put a dendrite on each processing node available
-                for(int nodes = 1; nodes < world_size; nodes++)
+                for(int node = 1; node < world_size; node++)
                 {
-			         
+                    comm_buffer_t commbuf;
+                    commbuf.dendr = dendr + node - 1;
+                    commbuf.step = step;
+                    commbuf.num_comps = num_comps;
+                    commbuf.delta_t = somaparams[0];
+                    commbuf.v_m = y[0]
+			        MPI_Send(&current, sizeof(comm_buffer_t), MPI_CHAR, node, MPI_ANY_TAG, MPI_COMM_WORLD);
                 } 
             }
 
