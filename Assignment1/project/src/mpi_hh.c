@@ -48,18 +48,21 @@
  * Description:
  * Code to be run on the master process
  */
-void master(void)
+void master(int num_dendrs, int world_size)
 {
     int t_ms;
-    for (t_ms = 1; t_ms < COMPTIME; t_ms++) 
+    for (int t_ms = 1; t_ms < COMPTIME; t_ms++) 
     {
-        for (step = 0; step < STEPS; step++) 
+        for (int step = 0; step < STEPS; step++) 
         {
             soma_params[2] = 0.0;
 
-            for(dendrite = 0; dendrite < num_dendrs; dendrite++) 
+            for(int dendrite = 0; dendrite < num_dendrs; dendrite+=world_size) 
             {
-                
+                for(int nodes = 0; nodes < world_size; nodes++)
+                {
+
+                } 
             }
             // Store previous HH model parameters.
             y0[0] = y[0]; y0[1] = y[1]; y0[2] = y[2]; y0[3] = y[3];
@@ -211,7 +214,7 @@ int main( int argc, char **argv )
 
     if(myrank == 0)
     {
-        master();
+        master(num_dendrs, world_size);
     }
     else
     {
