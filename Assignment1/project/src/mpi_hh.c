@@ -43,25 +43,6 @@
 #endif
 
 /**
-<<<<<<< HEAD
-=======
- * Name: main
- *
- * Description:
- * See usage statement (run program with '-h' flag).
- *
- * Parameters:
- * @param argc    number of command line arguments
- * @param argv    command line arguments
-*/
-//int main( int argc, char **argv )
-//{
-
-//}
-
-
-/**
->>>>>>> 5a368b98eaa37d9cf5c417854ea7084715f49dfb
  * Name: Master
  *
  * Description:
