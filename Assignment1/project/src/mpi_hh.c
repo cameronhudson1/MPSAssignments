@@ -246,30 +246,28 @@ int main( int argc, char **argv )
                     }
 
 
-			if (dendrite + world_size - 1 < num_denders)
-			{
-				
-                    		for(int node = 1; node < world_size; node++)
-                    		{
-                        		comm_buffer_t commbuf;
-                        		commbuf.dendr = dendrite + node - 1;
-                        		commbuf.step = step;
-                        		commbuf.num_comps = num_comps;
-                        		commbuf.delta_t = soma_params[0];
-                        		commbuf.v_m = y[0];
-                        		commbuf.done = 0;
-    		        	   	MPI_Send(&commbuf, sizeof(comm_buffer_t), MPI_CHAR, node, MPI_ANY_TAG, MPI_COMM_WORLD);
-                    		} 
+                    if (dendrite + world_size - 1 < num_denders)
+			         {
+                        for(int node = 1; node < world_size; node++)
+                        {
+                        	comm_buffer_t commbuf;
+                        	commbuf.dendr = dendrite + node - 1;
+                        	commbuf.step = step;
+                        	commbuf.num_comps = num_comps;
+                        	commbuf.delta_t = soma_params[0];
+                        	commbuf.v_m = y[0];
+                        	commbuf.done = 0;
+                        	MPI_Send(&commbuf, sizeof(comm_buffer_t), MPI_CHAR, node, MPI_ANY_TAG, MPI_COMM_WORLD);
+                        } 
 
-                    		// Get all the dendrite processing info back
-                    		for(int node = 1; node < world_size; node++)
-                    		{
-                        		double current_c;
-                        		MPI_Recv(&current_c, 1, MPI_DOUBLE, node, MPI_ANY_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-                        		soma_params[2] += current_c;
-                    		}
-			}
-
+                        // Get all the dendrite processing info back
+                        for(int node = 1; node < world_size; node++)
+                        {
+                        	double current_c;
+                        	MPI_Recv(&current_c, 1, MPI_DOUBLE, node, MPI_ANY_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+                        	soma_params[2] += current_c;
+                        }
+                    }
                 }
 
                 // Tell all processing nodes that work is done
