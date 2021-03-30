@@ -69,7 +69,6 @@ int main( int argc, char **argv )
     // Init Variables
     CmdArgs cmd_args;                       // Command line arguments.
     int num_comps, num_dendrs;              // Simulation parameters.
-    int i, j, t_ms, step, dendrite;         // Various indexing variables.
     struct timeval start, stop, diff;       // Values used to measure time.
 
     double exec_time;  // How long we take.
@@ -77,7 +76,7 @@ int main( int argc, char **argv )
     // Accumulators used during dendrite simulation.
     // NOTE: We depend on the compiler to handle the use of double[] variables as
     //       double*.
-    double current, **dendr_volt;
+    double **dendr_volt;
     double res[COMPTIME], y[NUMVAR], y0[NUMVAR], dydt[NUMVAR], soma_params[3];
 
     // Strings used to store filenames for the graph and data files.
@@ -230,7 +229,7 @@ int main( int argc, char **argv )
         {
             // This will update Vm in all compartments and will give a new injected
             // current value from last compartment into the soma.
-            double current = dendriteStep( dendr_volt[ commbuf.dendrite ],
+            double current = dendriteStep( dendr_volt[ commbuf.dendr ],
                                            commbuf.step + commbuf.dendr + 1,
                                            commbuf.num_comps,
                                            commbuf.delta_t,
