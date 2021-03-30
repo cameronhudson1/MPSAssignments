@@ -43,22 +43,6 @@
 #endif
 
 /**
- * Name: main
- *
- * Description:
- * See usage statement (run program with '-h' flag).
- *
- * Parameters:
- * @param argc    number of command line arguments
- * @param argv    command line arguments
-*/
-int main( int argc, char **argv )
-{
-
-}
-
-
-/**
  * Name: Master
  *
  * Description:
@@ -268,7 +252,7 @@ int main( int argc, char **argv )
 
 
 
-    
+
 
     // Original Code Below (To be put inside the master/slave block)
 
