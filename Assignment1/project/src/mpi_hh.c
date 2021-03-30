@@ -212,7 +212,7 @@ int main( int argc, char **argv )
     int world_size;
     MPI_Comm_size(MPI_COMM_WORLD, &world_size);
 
-    if(myrank == 0)
+    if(world_rank == 0)
     {
         master(num_dendrs, world_size);
     }
