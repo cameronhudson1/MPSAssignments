@@ -246,7 +246,7 @@ int main( int argc, char **argv )
                     }
 
 
-                    if (dendrite + world_size - 1 < num_dendrs)
+                    if ((dendrite + world_size - 1) < num_dendrs && (dendrite + world_size - 1) != 0)
 			         {
                         for(int node = 1; node < world_size; node++)
                         {
