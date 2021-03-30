@@ -16,12 +16,12 @@
 */
 
 #include "plot.h"
-#include <sys/types.h>
 #include "lib_hh.h"
 #include "cmd_args.h"
 #include "constants.h"
 
 #include <time.h>
+#include <types.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
