@@ -184,7 +184,7 @@ int main( int argc, char **argv )
                 // Put a dendrite on each processing node available
                 for(int nodes = 1; nodes < world_size; nodes++)
                 {
-			         
+			MPI_send();
                 } 
             }
 
