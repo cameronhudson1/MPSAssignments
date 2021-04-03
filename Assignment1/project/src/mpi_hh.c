@@ -210,6 +210,7 @@ int main( int argc, char **argv )
       MPI_Abort( MPI_COMM_WORLD, rc );
     }
 
+    printf("got here");
     int world_rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
 
