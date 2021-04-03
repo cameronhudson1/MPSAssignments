@@ -203,7 +203,12 @@ int main( int argc, char **argv )
     //////////////////////////////////////////////////////////////////////////////
 
     // Initialize MPI and MPI Variables
-    MPI_Init(&argc, &argv);
+    int rc = 0;
+    rc = MPI_Init( &argc, &argv );
+    if (rc != MPI_SUCCESS) {
+      fprintf( stderr, "Error starting MPI.\n" );
+      MPI_Abort( MPI_COMM_WORLD, rc );
+    }
 
     int world_rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
