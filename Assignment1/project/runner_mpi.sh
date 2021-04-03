@@ -38,7 +38,7 @@
 # then you MUST provide this line...it tells the node(s)
 # that you want to use this implementation of MPI. If you
 # omit this line, your results will indicate failure.
-module load openmpi-x86_64
+module load openmpi
 
 # Place your mpirun command here
 # Notice that you have to provide the number of processes that
