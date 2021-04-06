@@ -27,7 +27,7 @@ int main( int argc, char* argv[] )
         MPI_Abort(MPI_COMM_WORLD, MPI_ERR_OTHER);
     }
 
-    //Insert the MPI intialization code here.
+    //MPI intialization code.
     int rc = MPI_Init( &argc, &argv );
     if (rc != MPI_SUCCESS) {
       fprintf( stderr, "Error starting MPI.\n" );

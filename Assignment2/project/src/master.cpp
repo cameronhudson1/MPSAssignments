@@ -101,5 +101,25 @@ void masterSequential(ConfigData* data, float* pixels)
 
 void masterStaticStripsHorizontal(ConfigData* data, float* pixels)
 {
-    
+    int height = data.height;
+    int rank = data.mpi_rank;
+    int procs = data.mpi_procs;
+
+    /* Render the scene. */
+    // Iterate over rows for this partition
+    for( int row = ( (height/procs) * rank ); row < ( (height/procs) * (rank + 1) ); ++row )
+    {
+        // Iterate over all cols (strips span width)
+        for( int col = 0; col < data.width; ++col )
+        {
+            //Calculate the index into the array.
+            int baseIndex = 3 * ( row * data.width + col );
+
+            //Call the function to shade the pixel.
+            shadePixel(&(pixels[baseIndex]), row, col, &data);
+        }
+    }
+
+    /* Recieve slave process computations */
+
 }
