@@ -105,6 +105,13 @@ void masterStaticStripsHorizontal(ConfigData* data, float* pixels)
     int rank = data.mpi_rank;
     int procs = data.mpi_procs;
 
+    float *mypixels = NULL;
+    if((mypixels = malloc((height/procs) * sizeof(float))) == NULL)
+    {
+        // Malloc Error
+        exit();
+    }
+
     /* Render the scene. */
     // Iterate over rows for this partition
     for( int row = ( (height/procs) * rank ); row < ( (height/procs) * (rank + 1) ); ++row )
@@ -116,9 +123,16 @@ void masterStaticStripsHorizontal(ConfigData* data, float* pixels)
             int baseIndex = 3 * ( row * data.width + col );
 
             //Call the function to shade the pixel.
-            shadePixel(&(pixels[baseIndex]), row, col, &data);
+            shadePixel(&(mypixels[baseIndex]), row, col, &data);
         }
     }
+
+    //Stop the timing.
+    clock_t stop = clock();
+
+    //Figure out how much time was taken.
+    float time = (float)(stop - start) / (float)CLOCKS_PER_SEC;
+    std::cout << "Execution Time: " << time << " seconds" << std::endl << std::endl;
 
     /* Recieve slave process computations */
 

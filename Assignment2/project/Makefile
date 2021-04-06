@@ -1,7 +1,7 @@
 ################################################################################
 #include <string.h>
 # Variables common to all programs.
-CC = g++
+CC = g++-5
 MPICC = mpiCC
 
 FLAGS = -Wextra -Wall -Iinclude 
