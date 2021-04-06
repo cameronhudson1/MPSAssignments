@@ -28,6 +28,14 @@ int main( int argc, char* argv[] )
     }
 
     //Insert the MPI intialization code here.
+    int rc = MPI_Init( &argc, &argv );
+    if (rc != MPI_SUCCESS) {
+      fprintf( stderr, "Error starting MPI.\n" );
+      MPI_Abort( MPI_COMM_WORLD, rc );
+    }
+
+    MPI_Comm_rank(MPI_COMM_WORLD, &(data.mpi_rank));
+    MPI_Comm_size(MPI_COMM_WORLD, &(data.mpi_procs));
 
     if( data.mpi_rank == 0 )
     {
@@ -63,6 +71,7 @@ int main( int argc, char* argv[] )
         slaveMain( &data );
     }
 
+    MPI_Finalize();
     //Clean up the scene and other data.
     shutdown(&data);
 
