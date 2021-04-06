@@ -36,6 +36,12 @@ void masterMain(ConfigData* data)
             masterSequential(data, pixels);
             stopTime = MPI_Wtime();
             break;
+        case PART_MODE_STATIC_STRIPS_HORIZONTAL:
+            //Call the function that will handle this.
+            startTime = MPI_Wtime();
+            masterStaticStripsHorizontal(data, pixels);
+            stopTime = MPI_Wtime();
+            break;
         default:
             std::cout << "This mode (" << data->partitioningMode;
             std::cout << ") is not currently implemented." << std::endl;
@@ -91,4 +97,9 @@ void masterSequential(ConfigData* data, float* pixels)
     std::cout << "Total Communication Time: " << communicationTime << " seconds" << std::endl;
     double c2cRatio = communicationTime / computationTime;
     std::cout << "C-to-C Ratio: " << c2cRatio << std::endl;
+}
+
+void masterStaticStripsHorizontal(ConfigData* data, float* pixels)
+{
+    
 }

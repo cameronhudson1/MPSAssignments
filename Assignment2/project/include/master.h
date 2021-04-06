@@ -21,4 +21,6 @@ void masterMain( ConfigData *data );
 //Outputs: None
 void masterSequential(ConfigData *data, float* pixels);
 
+void masterStaticStripsHorizontal(ConfigData* data, float* pixels);
+
 #endif
