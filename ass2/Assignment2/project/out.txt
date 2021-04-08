@@ -1,0 +1,7 @@
+Scene: Complex Scene
+Width x Height: 5000 x 5000
+Partitioning scheme: 0
+Number of Processes: 1
+Execution Time: 3666.98 seconds
+
+Image will be save to: renders/rt_5000x5000_seq_p1_040821-094914.png
