@@ -27,10 +27,10 @@ SLURM
   When specifying the number of threads to use, make sure that both variables 
   in the script are changed.
     #SBATCH -p class -n <threads>
-    mpirun -np $SLURM_NPROCS raytrace_mpi ...
+    srun -n $SLURM_NPROCS raytrace_mpi ...
 
   You may notice some new syntax with $SLURM_NPROCS. This is present to 
-  guarantee that the mpirun command is running with the same number of 
+  guarantee that the srun command is running with the same number of 
   processes that you told SLURM to allocate. DO NOT CHANGE THIS VALUE!
 	
 Submitting Jobs
@@ -76,7 +76,7 @@ Example Commands:
   Render a 1200x1200 image of Turner Whitted's classic scene using strip
   partitioning and 5 processes:
 
-    mpirun -np 5 raytrace_mpi -h 1200 -w 1200 -c configs/twhitted.xml -p static_strips_vertical
+    srun -n 5 raytrace_mpi -h 1200 -w 1200 -c configs/twhitted.xml -p static_strips_vertical
 
 ================================================================================
 COMPLEX scene vs. SIMPLE scene:
@@ -84,12 +84,12 @@ COMPLEX scene vs. SIMPLE scene:
   To render the complex scene, specify the configs/box.xml configuration file
   to the raytrace program, e.g.
 
-    mpirun -np 1 raytrace_mpi -h 1000 -w 1000 -c configs/box.xml ...
+    srun -n 1 raytrace_mpi -h 1000 -w 1000 -c configs/box.xml ...
 
   To render the simple scene, specify the configs/twhitted.xml configuration
   file, e.g.
 
-    mpirun -np 1 raytrace_mpi -h 1000 -w 1000 -c configs/twhitted.xml ...
+    srun -n 1 raytrace_mpi -h 1000 -w 1000 -c configs/twhitted.xml ...
 
 ================================================================================
 Files of interest:

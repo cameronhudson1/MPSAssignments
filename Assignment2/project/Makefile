@@ -1,10 +1,10 @@
 ################################################################################
 #include <string.h>
 # Variables common to all programs.
-CC = g++-5
-MPICC = mpiCC
+CC = g++
+MPICC = mpic++ -D_GLIBCXX_USE_CXX11_ABI=0
 
-FLAGS = -Wextra -Wall -Iinclude 
+FLAGS = -Wextra -Wall -Iinclude -g
 
 LIBS = png raytrace
 LIBS_PNG = png
@@ -22,7 +22,7 @@ SEQ_SRC := $(addprefix src/,$(SEQ_SRC))
 ################################################################################
 # Variables used by MPI code.
 MPI_BIN = raytrace_mpi
-MPI_SRC = main_mpi.cpp master.cpp slave.cpp
+MPI_SRC = master.cpp main_mpi.cpp slave.cpp
 
 MPI_SRC := $(addprefix src/,$(MPI_SRC))
 ################################################################################

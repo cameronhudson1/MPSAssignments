@@ -15,21 +15,9 @@ void slaveMain(ConfigData* data)
         case PART_MODE_NONE:
             //The slave will do nothing since this means sequential operation.
             break;
-        case PART_MODE_STATIC_STRIPS_HORIZONTAL:
-            //Call the function that will handle this.
-            startTime = MPI_Wtime();
-            slaveStaticStripsHorizontal(data, pixels);
-            stopTime = MPI_Wtime();
-            break;
         default:
             std::cout << "This mode (" << data->partitioningMode;
             std::cout << ") is not currently implemented." << std::endl;
             break;
     }
-}
-
-
-slaveStaticStripsHorizontal(ConfigData* data, float* pixels)
-{
-    
 }

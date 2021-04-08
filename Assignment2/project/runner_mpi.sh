@@ -27,7 +27,8 @@
 # Multiple options can be used on the same line as shown below.
 # Here, we set the partition, number of cores to use, and the
 # number of nodes to spread the jobs over.
-#SBATCH -p class -n 6
+#SBATCH -p kgcoe-mps -n 6
+#SBATCH --mem-per-cpu=2000M
 
 #
 # Your job script goes below this line.
@@ -37,9 +38,9 @@
 # then you MUST provide this line...it tells the node(s)
 # that you want to use this implementation of MPI. If you
 # omit this line, your results will indicate failure.
-module load openmpi-x86_64
+module load openmpi
 
-# Place your mpirun command here
+# Place your srun command here
 # Notice that you have to provide the number of processes that
 # are needed. This number needs to match the number of cores
 # indicated by the -n option. If these do not, your results will
@@ -54,12 +55,12 @@ module load openmpi-x86_64
 # MAKE SURE THAT YOU ONLY HAVE ONE OF THESE UNCOMMENTED AT A TIME!
 # **********************************************************************
 # Sequential
-mpirun -np $SLURM_NPROCS raytrace_mpi -h 100 -w 100 -c configs/twhitted.xml -p none 
+srun -n $SLURM_NPROCS raytrace_mpi -h 100 -w 100 -c configs/twhitted.xml -p none 
 # Static Strips
-mpirun -np $SLURM_NPROCS raytrace_mpi -h 100 -w 100 -c configs/twhitted.xml -p static_strips_horizontal 
+# srun -n $SLURM_NPROCS raytrace_mpi -h 100 -w 100 -c configs/twhitted.xml -p static_strips_horizontal 
 # Static Cycles
-mpirun -np $SLURM_NPROCS raytrace_mpi -h 100 -w 100 -c configs/twhitted.xml -p static_cycles_vertical -cs 1
+# srun -n $SLURM_NPROCS raytrace_mpi -h 100 -w 100 -c configs/twhitted.xml -p static_cycles_vertical -cs 1
 # Static Blocks
-mpirun -np $SLURM_NPROCS raytrace_mpi -h 100 -w 100 -c configs/twhitted.xml -p static_blocks 
+# srun -n $SLURM_NPROCS raytrace_mpi -h 100 -w 100 -c configs/twhitted.xml -p static_blocks 
 # Dynamic
-mpirun -np $SLURM_NPROCS raytrace_mpi -h 100 -w 100 -c configs/twhitted.xml -p dynamic -bh 1 -bw 1 
+# srun -n $SLURM_NPROCS raytrace_mpi -h 100 -w 100 -c configs/twhitted.xml -p dynamic -bh 1 -bw 1 

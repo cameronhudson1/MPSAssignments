@@ -29,7 +29,8 @@
 # number of nodes to spread the jobs over.
 # Since this is a sequential(one process) job, we only need one
 # core and one node.
-#SBATCH -p class -n 1 -N 1
+#SBATCH -p kgcoe-mps -n 1 -N 1
+#SBATCH --mem-per-cpu=2000M
 
 #
 # Your job script goes below this line.
@@ -41,4 +42,4 @@
 # indicated by the -n option. If these do not, your results will
 # not be valid or you may have wasted resources that others could
 # have used.
-./raytrace_seq -h 100 -w 100 -c configs/twhitted.xml -p none
+./raytrace_seq -h 5000 -w 5000 -c configs/box.xml -p none
