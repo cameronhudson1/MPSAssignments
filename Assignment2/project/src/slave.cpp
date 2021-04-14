@@ -5,6 +5,9 @@
 #include "RayTrace.h"
 #include "slave.h"
 
+//primatives
+void slaveStaticStripsHorizontal(ConfigData* data, float* pixels);
+
 void slaveMain(ConfigData* data)
 {
     //Depending on the partitioning scheme, different things will happen.
@@ -17,9 +20,9 @@ void slaveMain(ConfigData* data)
             break;
         case PART_MODE_STATIC_STRIPS_HORIZONTAL:
             //Call the function that will handle this.
-            startTime = MPI_Wtime();
+            double startTime = MPI_Wtime();
             slaveStaticStripsHorizontal(data, pixels);
-            stopTime = MPI_Wtime();
+            double stopTime = MPI_Wtime();
             break;
         default:
             std::cout << "This mode (" << data->partitioningMode;
@@ -29,7 +32,7 @@ void slaveMain(ConfigData* data)
 }
 
 
-slaveStaticStripsHorizontal(ConfigData* data, float* pixels)
+void slaveStaticStripsHorizontal(ConfigData* data, float* pixels)
 {
     
 }
