@@ -107,10 +107,11 @@ void masterSequential(ConfigData* data, float* pixels)
 void masterStaticStripsHorizontal(ConfigData* data, float* pixels)
 {
     int height = data->height;
+    int width = data->width;
     int rank = data->mpi_rank;
     int procs = data->mpi_procs;
 
-    float *mypixels = (float *)malloc((height/procs) * sizeof(float));
+    float *mypixels = (float *)malloc((width/procs) * height * sizeof(float));
     if(mypixels == NULL)
     {
         // Malloc Error
@@ -121,10 +122,10 @@ void masterStaticStripsHorizontal(ConfigData* data, float* pixels)
 
     /* Render the scene. */
     // Iterate over rows for this partition
-    for( int row = ( (height/procs) * rank ); row < ( (height/procs) * (rank + 1) ); ++row )
+    for( int col = ( (width/procs) * rank ); col < ( (width/procs) * (rank + 1) ); ++col )
     {
         // Iterate over all cols (strips span width)
-        for( int col = 0; col < data->width; ++col )
+        for( int row = 0; row < data->height; ++row )
         {
             //Calculate the index into the array.
             int baseIndex = 3 * ( row * data->width + col );
