@@ -141,7 +141,7 @@ void masterStaticStripsHorizontal(ConfigData* data, float* pixels)
             int baseIndex = 3 * ( row * width + col );
 
             //Call the function to shade the pixel.
-            shadePixel(&(mypixels[baseIndex]), row, col, data);
+            shadePixel(&(pixels[baseIndex]), row, col, data);
         }
     }
 
@@ -156,7 +156,7 @@ void masterStaticStripsHorizontal(ConfigData* data, float* pixels)
     for(int p = 0; p < procs; ++p)
     {
         MPI_Status status;
-        MPI_Recv((pixels + (strip_width * rank)), 3 * strip_width, MPI_FLOAT, p, MPI_ANY_TAG, MPI_COMM_WORLD, &status)
+        MPI_Recv(&(pixels[strip_width * rank * 3]), 3 * strip_width, MPI_FLOAT, p, MPI_ANY_TAG, MPI_COMM_WORLD, &status)
         
     }
 }
