@@ -125,7 +125,7 @@ void masterStaticStripsHorizontal(ConfigData* data, float* pixels)
     if(strip_width != (int)strip_width)
     {
         std::cout << "Nodes cannot evenly divide image!" << std::endl;
-        MPI_Abort(MPI_COMM_WORLD);
+        MPI_Abort(MPI_COMM_WORLD, -1);
     }
 
     clock_t start = clock();
