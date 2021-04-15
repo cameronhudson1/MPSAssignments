@@ -29,6 +29,7 @@ int main( int argc, char* argv[] )
 
     //Insert the MPI intialization code here.
 
+
     if( data.mpi_rank == 0 )
     {
         //Create the output directory where all of the renders will be saved.

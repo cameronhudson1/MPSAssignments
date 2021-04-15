@@ -120,14 +120,14 @@ void masterStaticStripsHorizontal(ConfigData* data, float* pixels)
     int width = data->width;
     int rank = data->mpi_rank;
     int procs = data->mpi_procs;
+    float strip_width = width/procs;
 
-    float *mypixels = (float *)malloc((width/procs) * height * sizeof(float));
-    if(mypixels == NULL)
+    if(strip_width != (int)strip_width)
     {
-        // Malloc Error
-        exit(-1);
+        std::cout << "Nodes cannot evenly divide image!" << std::endl;
+        MPI_Abort(MPI_COMM_WORLD);
     }
-    
+
     clock_t start = clock();
 
     /* Render the scene. */
@@ -138,7 +138,7 @@ void masterStaticStripsHorizontal(ConfigData* data, float* pixels)
         for( int row = 0; row < data->height; ++row )
         {
             //Calculate the index into the array.
-            int baseIndex = 3 * ( row * data->width + col );
+            int baseIndex = 3 * ( row * width + col );
 
             //Call the function to shade the pixel.
             shadePixel(&(mypixels[baseIndex]), row, col, data);
@@ -153,5 +153,10 @@ void masterStaticStripsHorizontal(ConfigData* data, float* pixels)
     std::cout << "Execution Time: " << time << " seconds" << std::endl << std::endl;
 
     /* Recieve slave process computations */
-
+    for(int p = 0; p < procs; ++p)
+    {
+        MPI_Status status;
+        MPI_Recv((pixels + (strip_width * rank)), 3 * strip_width, MPI_FLOAT, p, MPI_ANY_TAG, MPI_COMM_WORLD, &status)
+        
+    }
 }
