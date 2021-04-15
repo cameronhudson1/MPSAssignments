@@ -16,6 +16,8 @@ void masterMain(ConfigData* data)
     //Depending on the partitioning scheme, different things will happen.
     //You should have a different function for each of the required 
     //schemes that returns some values that you need to handle.
+
+    MPI_Comm_rank(MPI_COMM_WORLD, &(data->mpi_rank));
     
     //Allocate space for the image on the master.
     float* pixels = new float[3 * data->width * data->height];
@@ -121,6 +123,8 @@ void masterStaticStripsHorizontal(ConfigData* data, float* pixels)
     int rank = data->mpi_rank;
     int procs = data->mpi_procs;
     float strip_width = width/procs;
+
+    std::cout << "Nodes cannot evenly divide image!" << std::endl;
 
     if(strip_width != (int)strip_width)
     {

@@ -28,7 +28,7 @@ int main( int argc, char* argv[] )
     }
 
     //Insert the MPI intialization code here.
-
+    MPI_Comm_size(MPI_COMM_WORLD, &data.mpi_procs);
 
     if( data.mpi_rank == 0 )
     {
