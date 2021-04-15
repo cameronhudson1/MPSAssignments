@@ -110,7 +110,7 @@ void masterSequential(ConfigData* data, float* pixels)
 	//functions that you write at the end of the function.
     std::cout << "Total Computation Time: " << computationTime << " seconds" << std::endl;
     std::cout << "Total Communication Time: " << communicationTime << " seconds" << std::endl;
-    double c2cRatio = communicationTime / computationTime;
+    //double c2cRatio = communicationTime / computationTime;
     std::cout << "C-to-C Ratio: " << c2cRatio << std::endl;
 }
 
