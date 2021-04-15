@@ -111,7 +111,7 @@ void masterSequential(ConfigData* data, float* pixels)
     std::cout << "Total Computation Time: " << computationTime << " seconds" << std::endl;
     std::cout << "Total Communication Time: " << communicationTime << " seconds" << std::endl;
     //double c2cRatio = communicationTime / computationTime;
-    std::cout << "C-to-C Ratio: " << c2cRatio << std::endl;
+    //std::cout << "C-to-C Ratio: " << c2cRatio << std::endl;
 }
 
 void masterStaticStripsHorizontal(ConfigData* data, float* pixels)
