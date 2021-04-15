@@ -110,8 +110,8 @@ void masterStaticStripsHorizontal(ConfigData* data, float* pixels)
     int rank = data->mpi_rank;
     int procs = data->mpi_procs;
 
-    float *mypixels = NULL;
-    if((mypixels = malloc((height/procs) * sizeof(float))) == NULL)
+    float *mypixels = (float *)malloc((height/procs) * sizeof(float));
+    if(mypixels == NULL)
     {
         // Malloc Error
         exit(-1);
