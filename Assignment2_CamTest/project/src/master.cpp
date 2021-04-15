@@ -6,11 +6,6 @@
 #include "RayTrace.h"
 #include "master.h"
 
-//Primatives
-
-void masterSequential(ConfigData* data, float* pixels);
-void masterStaticStripsHorizontal(ConfigData* data, float* pixels);
-
 void masterMain(ConfigData* data)
 {
     //Depending on the partitioning scheme, different things will happen.
@@ -40,22 +35,6 @@ void masterMain(ConfigData* data)
             startTime = MPI_Wtime();
             masterSequential(data, pixels);
             stopTime = MPI_Wtime();
-            break;
-        case PART_MODE_STATIC_STRIPS_HORIZONTAL:
-            //Call the function that will handle this.
-            startTime = MPI_Wtime();
-            masterStaticStripsHorizontal(data, pixels);
-            stopTime = MPI_Wtime();
-            break;
-        case PART_MODE_STATIC_STRIPS_VERTICAL:
-            break;
-        case PART_MODE_STATIC_BLOCKS:
-            break;
-        case PART_MODE_STATIC_CYCLES_HORIZONTAL:
-            break;
-        case PART_MODE_STATIC_CYCLES_VERTICAL:
-            break;
-        case PART_MODE_DYNAMIC:
             break;
         default:
             std::cout << "This mode (" << data->partitioningMode;
@@ -112,51 +91,4 @@ void masterSequential(ConfigData* data, float* pixels)
     std::cout << "Total Communication Time: " << communicationTime << " seconds" << std::endl;
     double c2cRatio = communicationTime / computationTime;
     std::cout << "C-to-C Ratio: " << c2cRatio << std::endl;
-}
-
-void masterStaticStripsHorizontal(ConfigData* data, float* pixels)
-{
-    int height = data->height;
-    int width = data->width;
-    int rank = data->mpi_rank;
-    int procs = data->mpi_procs;
-    float strip_width = width/procs;
-
-    if(strip_width != (int)strip_width)
-    {
-        std::cout << "Nodes cannot evenly divide image!" << std::endl;
-        MPI_Abort(MPI_COMM_WORLD, -1);
-    }
-
-    clock_t start = clock();
-
-    /* Render the scene. */
-    // Iterate over rows for this partition
-    for( int col = ( (width/procs) * rank ); col < ( (width/procs) * (rank + 1) ); ++col )
-    {
-        // Iterate over all cols (strips span width)
-        for( int row = 0; row < data->height; ++row )
-        {
-            //Calculate the index into the array.
-            int baseIndex = 3 * ( row * width + col );
-
-            //Call the function to shade the pixel.
-            shadePixel(&(pixels[baseIndex]), row, col, data);
-        }
-    }
-
-    //Stop the timing.
-    clock_t stop = clock();
-
-    //Figure out how much time was taken.
-    float time = (float)(stop - start) / (float)CLOCKS_PER_SEC;
-    std::cout << "Execution Time: " << time << " seconds" << std::endl << std::endl;
-
-    /* Recieve slave process computations */
-    for(int p = 0; p < procs; ++p)
-    {
-        MPI_Status status;
-        MPI_Recv(&(pixels[(int)strip_width * p * 3]), 3 * (int)strip_width), MPI_FLOAT, p, MPI_ANY_TAG, MPI_COMM_WORLD, &status)
-        
-    }
 }
