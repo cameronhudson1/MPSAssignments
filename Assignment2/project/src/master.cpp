@@ -122,8 +122,6 @@ void masterStaticStripsHorizontal(ConfigData* data, float* pixels)
     int procs = data->mpi_procs;
     float strip_width = width/procs;
 
-    std::cout << "Nodes cannot evenly divide image!" << std::endl;
-
     if(strip_width != (int)strip_width)
     {
         std::cout << "Nodes cannot evenly divide image!" << std::endl;
@@ -147,18 +145,19 @@ void masterStaticStripsHorizontal(ConfigData* data, float* pixels)
         }
     }
 
+    /* Recieve slave process computations */
+    for(int p = 0; p < procs; ++p)
+    {
+        std::cout << "Waiting to recieve from node " << p << std::endl;
+        MPI_Status status;
+        MPI_Recv(&(pixels[(int)strip_width * p * 3]), 3 * (int)strip_width, MPI_FLOAT, p, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+        std::cout << "got it!" << std::endl;
+    }
+
     //Stop the timing.
     clock_t stop = clock();
 
     //Figure out how much time was taken.
     float time = (float)(stop - start) / (float)CLOCKS_PER_SEC;
     std::cout << "Execution Time: " << time << " seconds" << std::endl << std::endl;
-
-    /* Recieve slave process computations */
-    for(int p = 0; p < procs; ++p)
-    {
-        MPI_Status status;
-        MPI_Recv(&(pixels[(int)strip_width * p * 3]), 3 * (int)strip_width, MPI_FLOAT, p, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
-        
-    }
 }
