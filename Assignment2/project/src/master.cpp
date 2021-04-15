@@ -47,6 +47,16 @@ void masterMain(ConfigData* data)
             masterStaticStripsHorizontal(data, pixels);
             stopTime = MPI_Wtime();
             break;
+        case PART_MODE_STATIC_STRIPS_VERTICAL:
+            break;
+        case PART_MODE_STATIC_BLOCKS:
+            break;
+        case PART_MODE_STATIC_CYCLES_HORIZONTAL:
+            break;
+        case PART_MODE_STATIC_CYCLES_VERTICAL:
+            break;
+        case PART_MODE_DYNAMIC:
+            break;
         default:
             std::cout << "This mode (" << data->partitioningMode;
             std::cout << ") is not currently implemented." << std::endl;
