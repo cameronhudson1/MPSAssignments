@@ -26,7 +26,7 @@ void slaveMain(ConfigData* data)
             slaveStaticStripsHorizontal(data, pixels);
             double stopTime = MPI_Wtime();
             break;
-	    }
+	      }
         default:
         {
             std::cout << "This mode (" << data->partitioningMode;
@@ -39,5 +39,18 @@ void slaveMain(ConfigData* data)
 
 void slaveStaticStripsHorizontal(ConfigData* data, float* pixels)
 {
-    
+    for( int i = 0; i < data->height; ++i )
+    {
+        for( int j = 0; j < data->width; ++j )
+        {
+            int row = i;
+            int column = j;
+
+            //Calculate the index into the array.
+            int baseIndex = 3 * ( row * data->width + column );
+
+            //Call the function to shade the pixel.
+            shadePixel(&(pixels[baseIndex]),row,j,data);
+        }
+    }
 }
