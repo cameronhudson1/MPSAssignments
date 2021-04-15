@@ -156,7 +156,7 @@ void masterStaticStripsHorizontal(ConfigData* data, float* pixels)
     for(int p = 0; p < procs; ++p)
     {
         MPI_Status status;
-        MPI_Recv(&(pixels[(int)strip_width * p * 3]), 3 * (int)strip_width, MPI_FLOAT, p, MPI_ANY_TAG, MPI_COMM_WORLD, &status)
+        MPI_Recv(&(pixels[(int)strip_width * p * 3]), 3 * (int)strip_width, MPI_FLOAT, p, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
         
     }
 }
