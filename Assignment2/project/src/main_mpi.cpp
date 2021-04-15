@@ -27,8 +27,11 @@ int main( int argc, char* argv[] )
         MPI_Abort(MPI_COMM_WORLD, MPI_ERR_OTHER);
     }
 
+    MPI_Init(NULL, NULL);
+
     //Insert the MPI intialization code here.
-    MPI_Comm_size(MPI_COMM_WORLD, &data.mpi_procs);
+    MPI_Comm_size(MPI_COMM_WORLD, &(data.mpi_procs));
+    MPI_Comm_rank(MPI_COMM_WORLD, &(data.mpi_rank));
 
     if( data.mpi_rank == 0 )
     {

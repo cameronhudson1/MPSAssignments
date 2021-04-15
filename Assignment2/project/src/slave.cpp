@@ -15,8 +15,6 @@ void slaveMain(ConfigData* data)
     //schemes that returns some values that you need to handle.
     float* pixels = new float[3 * ((data->width * data->height)/data->mpi_procs)];
 
-    MPI_Comm_rank(MPI_COMM_WORLD, &(data->mpi_rank));
-
     switch (data->partitioningMode)
     {
         case PART_MODE_NONE:
