@@ -146,7 +146,7 @@ void masterStaticStripsHorizontal(ConfigData* data, float* pixels)
     }
 
     /* Recieve slave process computations */
-    for(int p = 0; p < procs; ++p)
+    for(int p = 1; p < procs; ++p)
     {
         std::cout << "Waiting to recieve from node " << p << std::endl;
         MPI_Status status;
