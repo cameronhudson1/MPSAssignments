@@ -13,7 +13,7 @@ void slaveMain(ConfigData* data)
     //Depending on the partitioning scheme, different things will happen.
     //You should have a different function for each of the required 
     //schemes that returns some values that you need to handle.
-    float* pixels = new float[3 * ((data->width * data->height)/data->procs)];
+    float* pixels = new float[3 * ((data->width * data->height)/data->mpi_procs)];
 
     switch (data->partitioningMode)
     {
