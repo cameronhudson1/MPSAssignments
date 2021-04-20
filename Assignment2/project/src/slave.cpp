@@ -85,5 +85,5 @@ void slaveStaticBlock(ConfigData* data, float* pixels){
         }
     }
     MPI_Status status;
-    MPI_Send(pixels, 3 * (int)strip_width, MPI_FLOAT, 0, MPI_BUFFER_TAG, MPI_COMM_WORLD);
+    MPI_Send(pixels, 3 * (int)block_width, MPI_FLOAT, 0, MPI_BUFFER_TAG, MPI_COMM_WORLD);
 }
