@@ -17,6 +17,8 @@
 class Camera;
 class World;
 
+#define MPI_BUFFER_TAG 1
+
 //Specify the partitioning types that can be used.
 typedef enum{ 
     PART_MODE_NONE = 0,
