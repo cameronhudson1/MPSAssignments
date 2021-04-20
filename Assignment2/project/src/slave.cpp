@@ -67,3 +67,25 @@ void slaveStaticStripsHorizontal(ConfigData* data, float* pixels)
     }
     MPI_Send(pixels, 3 * width * height, MPI_FLOAT, 0, MPI_BUFFER_TAG, MPI_COMM_WORLD);
 }
+
+void slaveStaticBlock(ConfigData* data, float* pixels){
+    int height = data->height;
+    int width = data->width;
+    int rank = data->mpi_rank;
+    int procs = data->mpi_procs;
+    float block_width = width/procs;
+    float block_height = height/procs;
+    
+    for( int col = ( (width/procs) * rank ); col < ( (width/procs) * (rank + 1) ); ++col ){
+        // Iterate over all cols (strips span width)
+        for( int row = ( (height/procs) * rank ); row < ( (width/procs) * (rank + 1) ); ++row ){
+            //Calculate the index into the array.
+            int baseIndex = 3 * ( row * width + col );
+
+            //Call the function to shade the pixel.
+            shadePixel(&(pixels[baseIndex]), row, col, data);
+        }
+    }
+    MPI_Status status;
+    MPI_Send(pixels, 3 * (int)block_width, MPI_FLOAT, 0, MPI_BUFFER_TAG, MPI_COMM_WORLD);
+}

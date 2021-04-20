@@ -10,6 +10,7 @@
 
 void masterSequential(ConfigData* data, float* pixels);
 void masterStaticStripsHorizontal(ConfigData* data, float* pixels);
+void masterStaticBlock(ConfigData* data, float* pixels);
 
 void masterMain(ConfigData* data)
 {
@@ -54,7 +55,9 @@ void masterMain(ConfigData* data)
         case PART_MODE_STATIC_STRIPS_VERTICAL:
             break;
         case PART_MODE_STATIC_BLOCKS:
-            break;
+            startTime = MPI_Wtime();
+            masterStaticBlock(data, pixels);
+            stopTime = MPI_Wtime();
         case PART_MODE_STATIC_CYCLES_HORIZONTAL:
             break;
         case PART_MODE_STATIC_CYCLES_VERTICAL:
@@ -182,4 +185,38 @@ void masterStaticStripsHorizontal(ConfigData* data, float* pixels)
     //Figure out how much time was taken.
     float time = (float)(stop - start) / (float)CLOCKS_PER_SEC;
     std::cout << "Execution Time: " << time << " seconds" << std::endl << std::endl;
+}
+
+void masterStaticBlock(ConfigData* data, float* pixels){
+    int height = data->height;
+    int width = data->width;
+    int rank = data->mpi_rank;
+    int procs = data->mpi_procs;
+    float block_width = width/procs;
+    float block_height = height/procs;
+    
+     if(block_width != (int)block_width || block_height != (int)block_height)
+    {
+        std::cout << "Nodes cannot evenly divide image!" << std::endl;
+        MPI_Abort(MPI_COMM_WORLD, -1);
+    }
+
+    clock_t start = clock();
+    
+    /* Render the scene. */
+    // Iterate over rows for this partition
+    for( int col = ( (width/procs) * rank ); col < ( (width/procs) * (rank + 1) ); ++col )
+    {
+        // Iterate over all cols (strips span width)
+        for( int row = ( (height/procs) * rank ); row < ( (width/procs) * (rank + 1) ); ++row )
+        {
+            //Calculate the index into the array.
+            int baseIndex = 3 * ( row * width + col );
+
+            //Call the function to shade the pixel.
+            shadePixel(&(pixels[baseIndex]), row, col, data);
+        }
+    }
+    
+    
 }
