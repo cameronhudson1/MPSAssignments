@@ -135,7 +135,7 @@ void masterStaticStripsHorizontal(ConfigData* data, float* pixels)
 
     /* Render the scene. */
     // Iterate over rows for this partition
-    for( int col = ( (width/procs) * rank ); col < ( (width/procs) * (rank + 1) ); ++col )
+    for( int col = ( (strip_width/procs) * rank ); col < ( (strip_width/procs) * (rank + 1) ); ++col )
     {
         // Iterate over all cols (strips span width)
         for( int row = 0; row < data->height; ++row )
@@ -151,10 +151,31 @@ void masterStaticStripsHorizontal(ConfigData* data, float* pixels)
     /* Recieve slave process computations */
     for(int p = 1; p < procs; ++p)
     {
+        float* newpixels = new float[3 * (int)strip_width * height];
+
         std::cout << "Waiting to recieve from node " << p << std::endl;
         MPI_Status status;
-        MPI_Recv(&(pixels[(int)strip_width * p * 3]), 3 * (int)strip_width, MPI_FLOAT, p, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+        MPI_Recv(/*&(pixels[(int)strip_width * p * 3])*/newpixels, 3 * (int)strip_width, MPI_FLOAT, p, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
         std::cout << "got it!" << std::endl;
+
+        int idx = 0;
+        for( int col = ( (strip_width/procs) * rank ); col < ( (strip_width/procs) * (rank + 1) ); ++col )
+        {
+            // Iterate over all cols (strips span width)
+            for( int row = 0; row < data->height; ++row )
+            {
+                //Calculate the index into the array.
+                int baseIndex = 3 * ( row * width + col );
+
+                //Call the function to shade the pixel.
+                pixels[baseIndex] = newpixels[idx];
+                pixels[baseIndex+1] = newpixels[idx+1];
+                pixels[baseIndex+2] = newpixels[idx+2];
+                idx+=3;
+            }
+        }
+
+        delete[] newpixels;    
     }
 
     //Stop the timing.
