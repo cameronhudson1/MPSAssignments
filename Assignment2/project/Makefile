@@ -4,7 +4,7 @@
 CC = g++
 MPICC = mpic++ -D_GLIBCXX_USE_CXX11_ABI=0
 
-FLAGS = -Wextra -Wall -Iinclude -g
+FLAGS = -g -Wextra -Wall -Iinclude -g -fPIC
 
 LIBS = png raytrace
 LIBS_PNG = png

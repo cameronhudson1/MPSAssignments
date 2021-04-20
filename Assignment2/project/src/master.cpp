@@ -19,6 +19,10 @@ void masterMain(ConfigData* data)
     
     //Allocate space for the image on the master.
     float* pixels = new float[3 * data->width * data->height];
+    for(int i = 0; i < 3 * data->width * data->height; i++)
+    {
+        pixels[i] = 0;
+    }
     
     //Execution time will be defined as how long it takes
     //for the given function to execute based on partitioning
@@ -135,7 +139,7 @@ void masterStaticStripsHorizontal(ConfigData* data, float* pixels)
     for( int col = ( (strip_width/procs) * rank ); col < ( (strip_width/procs) * (rank + 1) ); ++col )
     {
         // Iterate over all cols (strips span width)
-        for( int row = 0; row < data->height; ++row )
+        for( int row = 0; row < height; ++row )
         {
             //Calculate the index into the array.
             int baseIndex = 3 * ( row * width + col );
@@ -146,29 +150,26 @@ void masterStaticStripsHorizontal(ConfigData* data, float* pixels)
     }
 
     /* Recieve slave process computations */
+    std::cout << "Total procs to recieve from:  " << procs << std::endl;
     for(int p = 1; p < procs; ++p)
     {
-        float* newpixels = new float[3 * (int)strip_width * height];
+        float* newpixels = new float[3 * width * height];
 
         std::cout << "Waiting to recieve from node " << p << std::endl;
         MPI_Status status;
-        MPI_Recv(/*&(pixels[(int)strip_width * p * 3])*/newpixels, 3 * (int)strip_width, MPI_FLOAT, p, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+        MPI_Recv(newpixels, 3 * width * height, MPI_FLOAT, p, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
         std::cout << "got it!" << std::endl;
 
-        int idx = 0;
-        for( int col = ( (strip_width/procs) * rank ); col < ( (strip_width/procs) * (rank + 1) ); ++col )
+        for( int col = 0; col < width; ++col )
         {
-            // Iterate over all cols (strips span width)
-            for( int row = 0; row < data->height; ++row )
+            for( int row = 0; row < height; ++row )
             {
-                //Calculate the index into the array.
                 int baseIndex = 3 * ( row * width + col );
 
-                //Call the function to shade the pixel.
-                pixels[baseIndex] = newpixels[idx];
-                pixels[baseIndex+1] = newpixels[idx+1];
-                pixels[baseIndex+2] = newpixels[idx+2];
-                idx+=3;
+                if(pixels[baseIndex] == 0 && newpixels[baseIndex] != 0)
+                {
+                    memcpy(&pixels[baseIndex], &newpixels[baseIndex], 3*sizeof(float));
+                }
             }
         }
 
