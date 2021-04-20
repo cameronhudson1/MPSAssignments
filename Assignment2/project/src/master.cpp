@@ -166,7 +166,9 @@ void masterStaticStripsHorizontal(ConfigData* data, float* pixels)
 
                 //Call the function to shade the pixel.
                 pixels[baseIndex] = newpixels[idx];
-                idx++;
+                pixels[baseIndex+1] = newpixels[idx+1];
+                pixels[baseIndex+2] = newpixels[idx+2];
+                idx+=3;
             }
         }
 
