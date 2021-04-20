@@ -152,11 +152,11 @@ void masterStaticStripsHorizontal(ConfigData* data, float* pixels)
 
         std::cout << "Waiting to recieve from node " << p << std::endl;
         MPI_Status status;
-        MPI_Recv(&(pixels[(int)strip_width * p * 3])/*newpixels*/, 3 * (int)strip_width, MPI_FLOAT, p, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+        MPI_Recv(/*&(pixels[(int)strip_width * p * 3])*/newpixels, 3 * (int)strip_width, MPI_FLOAT, p, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
         std::cout << "got it!" << std::endl;
 
-        /*
-        for( int col = ( (width/procs) * rank ); col < ( (width/procs) * (rank + 1) ); ++col )
+        int idx = 0
+        for( int col = ( (strip_width/procs) * rank ); col < ( (strip_width/procs) * (rank + 1) ); ++col )
         {
             // Iterate over all cols (strips span width)
             for( int row = 0; row < data->height; ++row )
@@ -165,10 +165,10 @@ void masterStaticStripsHorizontal(ConfigData* data, float* pixels)
                 int baseIndex = 3 * ( row * width + col );
 
                 //Call the function to shade the pixel.
-                shadePixel(&(pixels[baseIndex]), row, col, data);
+                pixels[baseIndex] = newpixels[idx];
+                idx++;
             }
         }
-        */
 
         delete[] newpixels;    
     }
