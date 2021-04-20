@@ -155,7 +155,7 @@ void masterStaticStripsHorizontal(ConfigData* data, float* pixels)
         MPI_Recv(/*&(pixels[(int)strip_width * p * 3])*/newpixels, 3 * (int)strip_width, MPI_FLOAT, p, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
         std::cout << "got it!" << std::endl;
 
-        int idx = 0
+        int idx = 0;
         for( int col = ( (strip_width/procs) * rank ); col < ( (strip_width/procs) * (rank + 1) ); ++col )
         {
             // Iterate over all cols (strips span width)
