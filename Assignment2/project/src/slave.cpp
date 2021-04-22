@@ -82,8 +82,8 @@ void slaveStaticBlock(ConfigData* data, float* pixels){
     int width = data->width;
     int rank = data->mpi_rank;
     int procs = data->mpi_procs;
-    float block_width = width/procs;
-    float block_height = height/procs;
+    float block_width = (width/procs) * sqrt(procs);
+    float block_height = (height/procs) * sqrt(procs);
     
     for( int col = ( (width/procs) * rank ); col < ( (width/procs) * (rank + 1) ); ++col ){
         // Iterate over all cols (strips span width)

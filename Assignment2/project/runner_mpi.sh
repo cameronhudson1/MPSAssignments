@@ -61,6 +61,6 @@ module load openmpi
 # Static Cycles
 # srun -n $SLURM_NPROCS raytrace_mpi -h 100 -w 100 -c configs/twhitted.xml -p static_cycles_vertical -cs 1
 # Static Blocks
- srun -n 4 raytrace_mpi -h 100 -w 100 -c configs/twhitted.xml -p static_blocks 
+ srun -n 9 raytrace_mpi -h 100 -w 100 -c configs/twhitted.xml -p static_blocks 
 # Dynamic
 # srun -n $SLURM_NPROCS raytrace_mpi -h 100 -w 100 -c configs/twhitted.xml -p dynamic -bh 1 -bw 1 
