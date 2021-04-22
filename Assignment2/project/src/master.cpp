@@ -153,8 +153,19 @@ void masterStaticStripsHorizontal(ConfigData* data, float* pixels)
         }
     }
 
+    for(int col = 0; col < width; ++col)
+    {
+        for(int row = 0; row < height; ++row)
+        {
+            int baseIndex = 3 * ( row * width + col );
+            std::cout << std::setprecision(2) << pixels[baseIndex] << "/";
+            std::cout << std::setprecision(2) << pixels[baseIndex+1] << "/";
+            std::cout << std::setprecision(2) << pixels[baseIndex+2] << "\t";
+        }
+        std::cout << std::endl;
+    }
+
     /* Recieve slave process computations */
-    std::cout << "Total procs to recieve from:  " << procs << std::endl;
     for(int p = 1; p < procs; ++p)
     {
         float* newpixels = new float[3 * width * height];
@@ -174,6 +185,7 @@ void masterStaticStripsHorizontal(ConfigData* data, float* pixels)
         delete[] newpixels;
     }
 
+    /*
     for(int col = 0; col < width; ++col)
     {
         for(int row = 0; row < height; ++row)
@@ -185,6 +197,7 @@ void masterStaticStripsHorizontal(ConfigData* data, float* pixels)
         }
         std::cout << std::endl;
     }
+    */
 
     //Stop the timing.
     clock_t stop = clock();
