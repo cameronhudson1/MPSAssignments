@@ -202,10 +202,10 @@ void masterStaticBlock(ConfigData* data, float* pixels){
     
     /* Render the scene. */
     // Iterate over rows for this partition
-    for( int col = ((block_width) * (rank % factor) ); col < ((block_width) * ((rank % factor) + 1)); ++col )
+    for( int col = (floor(block_width) * (rank % factor) ); col < (ceil(block_width) * ((rank % factor) + 1)); ++col )
     {
         // Iterate over all cols (strips span width)
-        for( int row = ((block_height) * floor(rank/factor) ); row < ((block_height) * (floor(rank/factor) + 1)); ++row )
+        for( int row = (floor(block_height) * floor(rank/factor) ); row < (ceil(block_height) * (floor(rank/factor) + 1)); ++row )
         {
             //Calculate the index into the array.
             int baseIndex = 3 * ( row * width + col );
@@ -223,9 +223,9 @@ void masterStaticBlock(ConfigData* data, float* pixels){
         MPI_Status status;
         MPI_Recv(newpixels, 3 * width * height, MPI_FLOAT, p, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
 
-        for( int col = ((block_width) * (p % factor) ); col < ((block_width) * ((p % factor) + 1)); ++col )
+        for( int col = (ceil(block_width) * (p % factor) ); col < (floor(block_width) * ((p % factor) + 1)); ++col )
         {
-            for( int row = ((block_height) * floor(p/factor) ); row < ((block_height) * (floor(p/factor) + 1)); ++row )
+            for( int row = (ceil(block_height) * floor(p/factor) ); row < (floor(block_height) * (floor(p/factor) + 1)); ++row )
             {
                 int baseIndex = 3 * ( row * width + col );
                 memcpy(&(pixels[baseIndex]), &(newpixels[baseIndex]), 3*sizeof(float));
