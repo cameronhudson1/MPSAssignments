@@ -136,7 +136,7 @@ void masterStaticStripsHorizontal(ConfigData* data, float* pixels)
         MPI_Abort(MPI_COMM_WORLD, -1);
     }
 
-    clock_t start = clock();
+    // clock_t start = clock();
 
     /* Render the scene. */
     // Iterate over rows for this partition
@@ -173,12 +173,14 @@ void masterStaticStripsHorizontal(ConfigData* data, float* pixels)
         delete[] newpixels;
     }
 
+    /*
     //Stop the timing.
     clock_t stop = clock();
 
     //Figure out how much time was taken.
     float time = (float)(stop - start) / (float)CLOCKS_PER_SEC;
     std::cout << "Execution Time: " << time << " seconds" << std::endl << std::endl;
+    */
 }
 
 void masterStaticBlock(ConfigData* data, float* pixels){
@@ -199,10 +201,10 @@ void masterStaticBlock(ConfigData* data, float* pixels){
     
     /* Render the scene. */
     // Iterate over rows for this partition
-    for( int col = ( (width/procs) * rank ); col < ( (width/procs) * (rank + 1) ); ++col )
+    for( int col = ( (block_width) * rank ); col < ( (block_width) * (rank + 1) ); ++col )
     {
         // Iterate over all cols (strips span width)
-        for( int row = ( (height/procs) * rank ); row < ( (width/procs) * (rank + 1) ); ++row )
+        for( int row = ( (block_height) * rank ); row < ( (block_height) * (rank + 1) ); ++row )
         {
             //Calculate the index into the array.
             int baseIndex = 3 * ( row * width + col );
@@ -211,6 +213,25 @@ void masterStaticBlock(ConfigData* data, float* pixels){
             shadePixel(&(pixels[baseIndex]), row, col, data);
         }
     }
-    
+
+    /* Recieve slave process computations */
+    for(int p = 1; p < procs; ++p)
+    {
+        float* newpixels = new float[3 * width * height];
+
+        MPI_Status status;
+        MPI_Recv(newpixels, 3 * width * height, MPI_FLOAT, p, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+
+        for( int col = (block_width * p); col < (block_width * (p + 1)); ++col )
+        {
+            for( int row = ( (block_height) * p ); row < (block_width * (p + 1)); ++row )
+            {
+                int baseIndex = 3 * ( row * width + col );
+                memcpy(&(pixels[baseIndex]), &(newpixels[baseIndex]), 3*sizeof(float));
+            }
+        }
+
+        delete[] newpixels;
+    }
     
 }
