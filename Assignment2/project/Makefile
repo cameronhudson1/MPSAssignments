@@ -45,3 +45,4 @@ $(PNG_BIN): $(PNG_SRC)
 
 clean:
 	rm -f $(SEQ_BIN) $(MPI_BIN) $(PNG_BIN)
+	rm -f renders/*.png

@@ -45,7 +45,7 @@ int main( int argc, char* argv[] )
             {
                 cerr << "Could not create the 'renders' directory!" << endl;
                 cerr << "Don't know where to save the rendered images!" << endl;
-                MPI_Abort(MPI_COMM_WORLD, MPI_ERR_OTHER); 
+                MPI_Abort(MPI_COMM_WORLD, MPI_ERR_OTHER);
             }
         }
 
