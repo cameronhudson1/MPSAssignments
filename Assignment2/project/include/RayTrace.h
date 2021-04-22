@@ -10,6 +10,7 @@
 #define __RAY_TRACE_H__
 
 #include <string>
+#include <cmath>
 
 //Declare the Camera and World as classes.
 //This will eliminate the need for any explicit header files here.

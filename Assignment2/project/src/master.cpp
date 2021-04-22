@@ -140,7 +140,7 @@ void masterStaticStripsHorizontal(ConfigData* data, float* pixels)
 
     /* Render the scene. */
     // Iterate over rows for this partition
-    for( int col = ( (strip_width) * rank ); col < ( (strip_width) * (rank + 1) ); ++col )
+    for( int col = ( floor(strip_width) * rank ); col < ( ceil(strip_width) * (rank + 1) ); ++col )
     {
         // Iterate over all cols (strips span width)
         for( int row = 0; row < height; ++row )
@@ -153,18 +153,6 @@ void masterStaticStripsHorizontal(ConfigData* data, float* pixels)
         }
     }
 
-    for(int col = 0; col < width; ++col)
-    {
-        for(int row = 0; row < height; ++row)
-        {
-            int baseIndex = 3 * ( row * width + col );
-            std::cout << std::setprecision(2) << pixels[baseIndex] << "/";
-            std::cout << std::setprecision(2) << pixels[baseIndex+1] << "/";
-            std::cout << std::setprecision(2) << pixels[baseIndex+2] << "\t";
-        }
-        std::cout << std::endl;
-    }
-
     /* Recieve slave process computations */
     for(int p = 1; p < procs; ++p)
     {
@@ -173,7 +161,7 @@ void masterStaticStripsHorizontal(ConfigData* data, float* pixels)
         MPI_Status status;
         MPI_Recv(newpixels, 3 * width * height, MPI_FLOAT, p, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
 
-        for( int col = (strip_width) * p; col < (strip_width) * (p + 1); ++col )
+        for( int col = ceil(strip_width) * p; col < floor(strip_width) * (p + 1); ++col )
         {
             for( int row = 0; row < height; ++row )
             {
@@ -184,20 +172,6 @@ void masterStaticStripsHorizontal(ConfigData* data, float* pixels)
 
         delete[] newpixels;
     }
-
-    /*
-    for(int col = 0; col < width; ++col)
-    {
-        for(int row = 0; row < height; ++row)
-        {
-            int baseIndex = 3 * ( row * width + col );
-            std::cout << std::setprecision(2) << pixels[baseIndex] << "/";
-            std::cout << std::setprecision(2) << pixels[baseIndex+1] << "/";
-            std::cout << std::setprecision(2) << pixels[baseIndex+2] << "\t";
-        }
-        std::cout << std::endl;
-    }
-    */
 
     //Stop the timing.
     clock_t stop = clock();

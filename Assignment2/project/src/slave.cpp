@@ -53,7 +53,7 @@ void slaveStaticStripsHorizontal(ConfigData* data, float* pixels)
     float strip_width = width/procs;
 
     // Iterate over rows for this partition
-    for( int col = ( (strip_width) * rank ); col < ( (strip_width) * (rank + 1) ); ++col )
+    for( int col = ( ceil(strip_width) * rank ); col < ( floor(strip_width) * (rank + 1) ); ++col )
     {
         // Iterate over all cols (strips span width)
         for( int row = 0; row < data->height; ++row )
