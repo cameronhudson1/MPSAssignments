@@ -28,17 +28,17 @@ void slaveMain(ConfigData* data)
         case PART_MODE_STATIC_STRIPS_HORIZONTAL:
         {
             //Call the function that will handle this.
-            double startTime = MPI_Wtime();
+            //double startTime = MPI_Wtime();
             slaveStaticStripsHorizontal(data, pixels);
-            double stopTime = MPI_Wtime();
+            //double stopTime = MPI_Wtime();
             break;
 	    }
         case PART_MODE_STATIC_BLOCKS:
         {
             //Call the function that will handle blocks.
-            double startTime = MPI_Wtime();
+            //double startTime = MPI_Wtime();
             slaveStaticBlock(data, pixels);
-            double stopTime = MPI_Wtime();
+            //double stopTime = MPI_Wtime();
             break;
         }
         default:
@@ -88,7 +88,7 @@ void slaveStaticBlock(ConfigData* data, float* pixels){
     
     for( int col = ( (block_width) * (rank % factor) ); col < ( (block_width) * ((rank % factor) + 1) ); ++col ){
         // Iterate over all cols (strips span width)
-        for( int row = ( (block_height) * (rank % factor) ); row < ( (block_height) * ((rank % factor) + 1) ); ++row ){
+        for( int row = ( (block_height) * (rank/factor) ); row < ( (block_height) * ((rank/factor) + 1) ); ++row ){
             //Calculate the index into the array.
             int baseIndex = 3 * ( row * width + col );
 
