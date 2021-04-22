@@ -32,6 +32,14 @@ void slaveMain(ConfigData* data)
             double stopTime = MPI_Wtime();
             break;
 	      }
+        case PART_MODE_STATIC_BLOCKS:
+        {
+            //Call the function that will handle this.
+            double startTime = MPI_Wtime();
+            slaveslaveStaticBlock(data, pixels);
+            double stopTime = MPI_Wtime();
+            break;
+	      }
         default:
         {
             std::cout << "This mode (" << data->partitioningMode;
