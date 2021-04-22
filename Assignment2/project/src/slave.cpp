@@ -7,6 +7,7 @@
 
 //primatives
 void slaveStaticStripsHorizontal(ConfigData* data, float* pixels);
+void slaveStaticBlock(ConfigData* data, float* pixels);
 
 void slaveMain(ConfigData* data)
 {
@@ -31,15 +32,15 @@ void slaveMain(ConfigData* data)
             slaveStaticStripsHorizontal(data, pixels);
             double stopTime = MPI_Wtime();
             break;
-	      }
+	    }
         case PART_MODE_STATIC_BLOCKS:
         {
-            //Call the function that will handle this.
+            //Call the function that will handle blocks.
             double startTime = MPI_Wtime();
-            slaveslaveStaticBlock(data, pixels);
+            slaveStaticBlock(data, pixels);
             double stopTime = MPI_Wtime();
             break;
-	      }
+        }
         default:
         {
             std::cout << "This mode (" << data->partitioningMode;
@@ -84,9 +85,9 @@ void slaveStaticBlock(ConfigData* data, float* pixels){
     float block_width = width/procs;
     float block_height = height/procs;
     
-    for( int col = ( block_width  * rank ); col < ( block_width  * (rank + 1) ); ++col ){
+    for( int col = ( (width/procs) * rank ); col < ( (width/procs) * (rank + 1) ); ++col ){
         // Iterate over all cols (strips span width)
-        for( int row = ( block_height * rank ); row < ( block_height * (rank + 1) ); ++row ){
+        for( int row = ( (height/procs) * rank ); row < ( (width/procs) * (rank + 1) ); ++row ){
             //Calculate the index into the array.
             int baseIndex = 3 * ( row * width + col );
 
