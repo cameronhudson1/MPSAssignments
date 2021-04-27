@@ -142,7 +142,7 @@ void masterStaticStripsHorizontal(ConfigData* data, float* pixels)
     }
     */
 
-    // clock_t start = clock();
+    clock_t start = clock();
 
     /* Render the scene. */
     // Iterate over rows for this partition
@@ -160,13 +160,14 @@ void masterStaticStripsHorizontal(ConfigData* data, float* pixels)
     }
 
     /* Recieve slave process computations */
+    double slave_time[procs];
     for(int p = 1; p < procs; ++p)
     {
-        float* newpixels = new float[3 * width * height];
+        float* newpixels = new float[3 * width * height + 1];
 
         MPI_Status status;
         MPI_Recv(newpixels, 3 * width * height, MPI_FLOAT, p, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
-
+        slave_time[p] = newpixels[3 * width * height];
         for( int col = ceil(strip_width) * p; col < floor(strip_width) * (p + 1); ++col )
         {
             for( int row = 0; row < height; ++row )
@@ -179,14 +180,16 @@ void masterStaticStripsHorizontal(ConfigData* data, float* pixels)
         delete[] newpixels;
     }
 
-    /*
+    
     //Stop the timing.
     clock_t stop = clock();
 
     //Figure out how much time was taken.
     float time = (float)(stop - start) / (float)CLOCKS_PER_SEC;
     std::cout << "Execution Time: " << time << " seconds" << std::endl << std::endl;
-    */
+    for (int j = 1; j < procs; j++){
+        std::cout<< "Execution Time: " << slave_time[j] << " seconds" << std::endl << std::endl;
+    }
 }
 
 void masterStaticBlock(ConfigData* data, float* pixels){

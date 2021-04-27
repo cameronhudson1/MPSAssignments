@@ -15,7 +15,7 @@ void slaveMain(ConfigData* data)
     //Depending on the partitioning scheme, different things will happen.
     //You should have a different function for each of the required 
     //schemes that returns some values that you need to handle.
-    float* pixels = new float[3 * data->width * data->height];
+    float* pixels = new float[3 * data->width * data->height + 1];
     for(int i = 0; i < 3 * data->width * data->height; i++)
     {
         pixels[i] = 0;
@@ -67,6 +67,9 @@ void slaveStaticStripsHorizontal(ConfigData* data, float* pixels)
     int procs = data->mpi_procs;
     float strip_width = width/procs;
 
+    //start time
+    double comp_start, comp_stop, comp_time;
+    comp_start = MPI_Wtime();
     // Iterate over rows for this partition
     for( int col = ( ceil(strip_width) * rank ); col < ( floor(strip_width) * (rank + 1) ); ++col )
     {
@@ -80,6 +83,13 @@ void slaveStaticStripsHorizontal(ConfigData* data, float* pixels)
             shadePixel(&(pixels[baseIndex]), row, col, data);
         }
     }
+    //end time
+    comp_stop = MPI_Wtime();
+    comp_time = comp_stop - comp_start;
+    
+    //tack on the end
+    pixels[3 * data->width * data->height] = comp_time;
+    
     MPI_Send(pixels, 3 * width * height, MPI_FLOAT, 0, MPI_BUFFER_TAG, MPI_COMM_WORLD);
 }
 
