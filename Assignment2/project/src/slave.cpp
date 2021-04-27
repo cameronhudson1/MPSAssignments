@@ -8,6 +8,7 @@
 //primatives
 void slaveStaticStripsHorizontal(ConfigData* data, float* pixels);
 void slaveStaticBlock(ConfigData* data, float* pixels);
+void slaveStaticCyclesVertical(ConfigData* data, float* pixels);
 
 void slaveMain(ConfigData* data)
 {
@@ -32,13 +33,18 @@ void slaveMain(ConfigData* data)
             slaveStaticStripsHorizontal(data, pixels);
             //double stopTime = MPI_Wtime();
             break;
-	    }
+        }
         case PART_MODE_STATIC_BLOCKS:
         {
             //Call the function that will handle blocks.
             //double startTime = MPI_Wtime();
             slaveStaticBlock(data, pixels);
             //double stopTime = MPI_Wtime();
+            break;
+        }
+        case PART_MODE_STATIC_CYCLES_VERTICAL:
+        {
+            slaveStaticCyclesVertical(data, pixels);
             break;
         }
         default:
@@ -88,7 +94,7 @@ void slaveStaticBlock(ConfigData* data, float* pixels){
     
     for( int col = (ceil(block_width) * (rank % factor) ); col < (floor(block_width) * ((rank % factor) + 1) ); ++col ){
         // Iterate over all cols (strips span width)
-        for( int row = (ceil(block_height) * (rank/factor) ); row < (floor(block_height) * ((rank/factor) + 1) ); ++row ){
+        for( int row = (ceil(block_height) * floor(rank/factor) ); row < (floor(block_height) * (floor(rank/factor) + 1) ); ++row ){
             //Calculate the index into the array.
             int baseIndex = 3 * ( row * width + col );
 
@@ -96,5 +102,33 @@ void slaveStaticBlock(ConfigData* data, float* pixels){
             shadePixel(&(pixels[baseIndex]), row, col, data);
         }
     }
+
+    MPI_Send(pixels, 3 * width * height, MPI_FLOAT, 0, MPI_BUFFER_TAG, MPI_COMM_WORLD);
+}
+
+void slaveStaticCyclesVertical(ConfigData* data, float* pixels)
+{
+    int height = data->height;
+    int width = data->width;
+    int rank = data->mpi_rank;
+    int procs = data->mpi_procs;
+    int cycle_height = data->cycleSize;
+
+    // Process for this node
+    for(int part = rank * cycle_height; part < height; part += (procs * cycle_height))
+    {
+        for(int col = 0; col < width; ++col)
+        {
+            for(int row = part; row < (row + cycle_height > height ? height : row + cycle_height); ++row)
+            {
+                //Calculate the index into the array.
+                int baseIndex = 3 * ( row * width + col );
+
+                //Call the function to shade the pixel.
+                shadePixel(&(pixels[baseIndex]), row, col, data);
+            }
+        }
+    }
+
     MPI_Send(pixels, 3 * width * height, MPI_FLOAT, 0, MPI_BUFFER_TAG, MPI_COMM_WORLD);
 }

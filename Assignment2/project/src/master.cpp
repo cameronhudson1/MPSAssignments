@@ -12,6 +12,7 @@
 void masterSequential(ConfigData* data, float* pixels);
 void masterStaticStripsHorizontal(ConfigData* data, float* pixels);
 void masterStaticBlock(ConfigData* data, float* pixels);
+void masterStaticCyclesVertical(ConfigData* data, float* pixels);
 
 void masterMain(ConfigData* data)
 {
@@ -62,6 +63,9 @@ void masterMain(ConfigData* data)
         case PART_MODE_STATIC_CYCLES_HORIZONTAL:
             break;
         case PART_MODE_STATIC_CYCLES_VERTICAL:
+        startTime = MPI_Wtime();
+            masterStaticCyclesVertical(data, pixels);
+            stopTime = MPI_Wtime();
             break;
         case PART_MODE_DYNAMIC:
             break;
@@ -130,11 +134,13 @@ void masterStaticStripsHorizontal(ConfigData* data, float* pixels)
     int procs = data->mpi_procs;
     float strip_width = width/procs;
 
+    /*
     if(strip_width != (int)strip_width)
     {
         std::cout << "Nodes cannot evenly divide image!" << std::endl;
         MPI_Abort(MPI_COMM_WORLD, -1);
     }
+    */
 
     // clock_t start = clock();
 
@@ -192,11 +198,13 @@ void masterStaticBlock(ConfigData* data, float* pixels){
     float block_width = width/procs * factor;
     float block_height = height/procs * factor;
     
-     if(block_width != (int)block_width || block_height != (int)block_height)
+    /*
+    if(block_width != (int)block_width || block_height != (int)block_height)
     {
         std::cout << "Nodes cannot evenly divide image!" << std::endl;
         MPI_Abort(MPI_COMM_WORLD, -1);
     }
+    */
 
     //clock_t start = clock();
     
@@ -235,4 +243,52 @@ void masterStaticBlock(ConfigData* data, float* pixels){
         delete[] newpixels;
     }
     
+}
+
+void masterStaticCyclesVertical(ConfigData* data, float* pixels)
+{
+    int height = data->height;
+    int width = data->width;
+    int rank = data->mpi_rank;
+    int procs = data->mpi_procs;
+    int cycle_height = data->cycleSize;
+
+    // Process for this node
+    for(int part = rank * cycle_height; part < height; part += (procs * cycle_height))
+    {
+        for(int col = 0; col < width; ++col)
+        {
+            for(int row = part; row < (row + cycle_height > height ? height : row + cycle_height); ++row)
+            {
+                //Calculate the index into the array.
+                int baseIndex = 3 * ( row * width + col );
+
+                //Call the function to shade the pixel.
+                shadePixel(&(pixels[baseIndex]), row, col, data);
+            }
+        }
+    }
+
+    for(int p = 1; p < procs; ++p)
+    {
+        float* newpixels = new float[3 * width * height];
+
+        MPI_Status status;
+        MPI_Recv(newpixels, 3 * width * height, MPI_FLOAT, p, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+
+        for(int part = rank * cycle_height; part < height; part += (procs * cycle_height))
+        {
+            for(int col = 0; col < width; ++col)
+            {
+                for(int row = part; row < (row + cycle_height > height ? height : row + cycle_height); ++row)
+                {
+                    //Calculate the index into the array.
+                    int baseIndex = 3 * ( row * width + col );
+                    memcpy(&(pixels[baseIndex]), &(newpixels[baseIndex]), 3*sizeof(float));
+                }
+            }
+        }
+
+        delete[] newpixels;
+    }
 }
