@@ -57,10 +57,10 @@ module load openmpi
 # Sequential
 # srun -n 2 raytrace_mpi -h 100 -w 100 -c configs/twhitted.xml -p none 
 # Static Strips
-# srun --slurmd-debug=quiet -n 6 raytrace_mpi -h 100 -w 100 -c configs/twhitted.xml -p static_strips_horizontal 
+ srun --mem-per-cpu=2G -n 6 raytrace_mpi -h 5000 -w 5000 -c configs/twhitted.xml -p static_strips_horizontal 
 # Static Cycles
- srun -n 16 raytrace_mpi -h 100 -w 100 -c configs/twhitted.xml -p static_cycles_vertical -cs 178
+# srun --mem-per-cpu=2G -n 16 raytrace_mpi -h 100 -w 100 -c configs/twhitted.xml -p static_cycles_vertical -cs 178
 # Static Blocks
-# srun -n 64 raytrace_mpi -h 100 -w 100 -c configs/twhitted.xml -p static_blocks 
+# srun --mem-per-cpu=2G -n 64 raytrace_mpi -h 100 -w 100 -c configs/twhitted.xml -p static_blocks 
 # Dynamic
-# srun -n $SLURM_NPROCS raytrace_mpi -h 100 -w 100 -c configs/twhitted.xml -p dynamic -bh 1 -bw 1 
+# srun --mem-per-cpu=2G -n $SLURM_NPROCS raytrace_mpi -h 100 -w 100 -c configs/twhitted.xml -p dynamic -bh 1 -bw 1 

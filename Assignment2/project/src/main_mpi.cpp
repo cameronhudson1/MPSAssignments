@@ -67,6 +67,8 @@ int main( int argc, char* argv[] )
         slaveMain( &data );
     }
 
+    MPI_Finalize();
+
     //Clean up the scene and other data.
     shutdown(&data);
 
