@@ -61,6 +61,6 @@ module load openmpi
 # Static Cycles
 # srun --mem-per-cpu=2G -n 16 raytrace_mpi -h 100 -w 100 -c configs/twhitted.xml -p static_cycles_vertical -cs 178
 # Static Blocks
-# srun --mem-per-cpu=2G -n 64 raytrace_mpi -h 100 -w 100 -c configs/twhitted.xml -p static_blocks 
+# srun --mem-per-cpu=2G -n 64 raytrace_mpi -h 5000 -w 5000 -c configs/twhitted.xml -p static_blocks 
 # Dynamic
 # srun --mem-per-cpu=2G -n $SLURM_NPROCS raytrace_mpi -h 100 -w 100 -c configs/twhitted.xml -p dynamic -bh 1 -bw 1 

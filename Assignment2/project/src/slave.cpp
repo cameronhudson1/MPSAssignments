@@ -68,8 +68,9 @@ void slaveStaticStripsHorizontal(ConfigData* data, float* pixels)
     float strip_width = width/procs;
 
     //start time
-    double comp_start, comp_stop, comp_time;
-    comp_start = MPI_Wtime();
+    clock_t comp_start, comp_stop;
+    float comp_time;
+    comp_start = clock();
     // Iterate over rows for this partition
     for( int col = ( ceil(strip_width) * rank ); col < ( floor(strip_width) * (rank + 1) ); ++col )
     {
@@ -84,13 +85,13 @@ void slaveStaticStripsHorizontal(ConfigData* data, float* pixels)
         }
     }
     //end time
-    comp_stop = MPI_Wtime();
-    comp_time = comp_stop - comp_start;
+    comp_stop = clock();
+    comp_time = ((float)comp_stop - (float)comp_start) / CLOCKS_PER_SEC;
     
     //tack on the end
     pixels[3 * data->width * data->height] = comp_time;
     
-    MPI_Send(pixels, 3 * width * height, MPI_FLOAT, 0, MPI_BUFFER_TAG, MPI_COMM_WORLD);
+    MPI_Send(pixels, 3 * width * height + 1, MPI_FLOAT, 0, MPI_BUFFER_TAG, MPI_COMM_WORLD);
 }
 
 void slaveStaticBlock(ConfigData* data, float* pixels){

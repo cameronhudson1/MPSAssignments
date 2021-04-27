@@ -133,14 +133,7 @@ void masterStaticStripsHorizontal(ConfigData* data, float* pixels)
     int rank = data->mpi_rank;
     int procs = data->mpi_procs;
     float strip_width = width/procs;
-
-    /*
-    if(strip_width != (int)strip_width)
-    {
-        std::cout << "Nodes cannot evenly divide image!" << std::endl;
-        MPI_Abort(MPI_COMM_WORLD, -1);
-    }
-    */
+    float proc_comp_time[procs];
 
     clock_t start = clock();
 
@@ -159,15 +152,17 @@ void masterStaticStripsHorizontal(ConfigData* data, float* pixels)
         }
     }
 
+    //Stop the timing.
+    clock_t stop = clock();
+    proc_comp_time[0] = ((float)stop - (float)start) / CLOCKS_PER_SEC;
+
     /* Recieve slave process computations */
-    double slave_time[procs];
     for(int p = 1; p < procs; ++p)
     {
         float* newpixels = new float[3 * width * height + 1];
 
         MPI_Status status;
-        MPI_Recv(newpixels, 3 * width * height, MPI_FLOAT, p, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
-        slave_time[p] = newpixels[3 * width * height];
+        MPI_Recv(newpixels, 3 * width * height + 1, MPI_FLOAT, p, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
         for( int col = ceil(strip_width) * p; col < floor(strip_width) * (p + 1); ++col )
         {
             for( int row = 0; row < height; ++row )
@@ -177,18 +172,15 @@ void masterStaticStripsHorizontal(ConfigData* data, float* pixels)
             }
         }
 
+        proc_comp_time[p] = newpixels[3 * width * height];
+
         delete[] newpixels;
     }
 
-    
-    //Stop the timing.
-    clock_t stop = clock();
-
-    //Figure out how much time was taken.
-    float time = (float)(stop - start) / (float)CLOCKS_PER_SEC;
-    std::cout << "Execution Time: " << time << " seconds" << std::endl << std::endl;
-    for (int j = 1; j < procs; j++){
-        std::cout<< "Execution Time: " << slave_time[j] << " seconds" << std::endl << std::endl;
+    // Output how much time was taken
+    for (int j = 0; j < procs; j++)
+    {
+        std::cout<< "Execution Time for " << j << ": " << proc_comp_time[j] << " seconds" << std::endl << std::endl;
     }
 }
 
@@ -200,14 +192,6 @@ void masterStaticBlock(ConfigData* data, float* pixels){
     int factor = sqrt(procs);
     float block_width = width/procs * factor;
     float block_height = height/procs * factor;
-    
-    /*
-    if(block_width != (int)block_width || block_height != (int)block_height)
-    {
-        std::cout << "Nodes cannot evenly divide image!" << std::endl;
-        MPI_Abort(MPI_COMM_WORLD, -1);
-    }
-    */
 
     //clock_t start = clock();
     
