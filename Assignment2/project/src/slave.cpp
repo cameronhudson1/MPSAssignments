@@ -119,7 +119,7 @@ void slaveStaticCyclesVertical(ConfigData* data, float* pixels)
     {
         for(int col = 0; col < width; ++col)
         {
-            for(int row = part; row < (row + cycle_height > height ? height : row + cycle_height); ++row)
+            for(int row = part; row < ((part + cycle_height) >= height ? height : part + cycle_height); ++row)
             {
                 //Calculate the index into the array.
                 int baseIndex = 3 * ( row * width + col );

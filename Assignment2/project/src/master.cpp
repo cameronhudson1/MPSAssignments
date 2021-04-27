@@ -258,7 +258,7 @@ void masterStaticCyclesVertical(ConfigData* data, float* pixels)
     {
         for(int col = 0; col < width; ++col)
         {
-            for(int row = part; row < (row + cycle_height > height ? height : row + cycle_height); ++row)
+            for(int row = part; row < (part + cycle_height >= height ? height : part + cycle_height); ++row)
             {
                 //Calculate the index into the array.
                 int baseIndex = 3 * ( row * width + col );
@@ -269,6 +269,7 @@ void masterStaticCyclesVertical(ConfigData* data, float* pixels)
         }
     }
 
+    
     for(int p = 1; p < procs; ++p)
     {
         float* newpixels = new float[3 * width * height];
@@ -276,11 +277,11 @@ void masterStaticCyclesVertical(ConfigData* data, float* pixels)
         MPI_Status status;
         MPI_Recv(newpixels, 3 * width * height, MPI_FLOAT, p, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
 
-        for(int part = rank * cycle_height; part < height; part += (procs * cycle_height))
+        for(int part = p * cycle_height; part < height; part += (procs * cycle_height))
         {
             for(int col = 0; col < width; ++col)
             {
-                for(int row = part; row < (row + cycle_height > height ? height : row + cycle_height); ++row)
+                for(int row = part; row < (part + cycle_height >= height ? height : part + cycle_height); ++row)
                 {
                     //Calculate the index into the array.
                     int baseIndex = 3 * ( row * width + col );
@@ -291,4 +292,5 @@ void masterStaticCyclesVertical(ConfigData* data, float* pixels)
 
         delete[] newpixels;
     }
+    
 }
