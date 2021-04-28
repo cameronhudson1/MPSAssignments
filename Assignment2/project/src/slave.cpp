@@ -103,6 +103,11 @@ void slaveStaticBlock(ConfigData* data, float* pixels){
     float block_width = (width/procs) * factor;
     float block_height = (height/procs) * factor;
     
+    //start time
+    clock_t comp_start, comp_stop;
+    float comp_time;
+    comp_start = clock();
+    
     for( int col = (ceil(block_width) * (rank % factor) ); col < (floor(block_width) * ((rank % factor) + 1) ); ++col ){
         // Iterate over all cols (strips span width)
         for( int row = (ceil(block_height) * floor(rank/factor) ); row < (floor(block_height) * (floor(rank/factor) + 1) ); ++row ){
@@ -113,6 +118,13 @@ void slaveStaticBlock(ConfigData* data, float* pixels){
             shadePixel(&(pixels[baseIndex]), row, col, data);
         }
     }
+    
+    //end time
+    comp_stop = clock();
+    comp_time = ((float)comp_stop - (float)comp_start) / CLOCKS_PER_SEC;
+    
+    //tack on the end
+    pixels[3 * data->width * data->height] = comp_time;
 
     MPI_Send(pixels, 3 * width * height, MPI_FLOAT, 0, MPI_BUFFER_TAG, MPI_COMM_WORLD);
 }
@@ -124,6 +136,11 @@ void slaveStaticCyclesVertical(ConfigData* data, float* pixels)
     int rank = data->mpi_rank;
     int procs = data->mpi_procs;
     int cycle_height = data->cycleSize;
+    
+    //start time
+    clock_t comp_start, comp_stop;
+    float comp_time;
+    comp_start = clock();
 
     // Process for this node
     for(int part = rank * cycle_height; part < height; part += (procs * cycle_height))
@@ -140,6 +157,13 @@ void slaveStaticCyclesVertical(ConfigData* data, float* pixels)
             }
         }
     }
+    
+    //end time
+    comp_stop = clock();
+    comp_time = ((float)comp_stop - (float)comp_start) / CLOCKS_PER_SEC;
+    
+    //tack on the end
+    pixels[3 * data->width * data->height] = comp_time;
 
     MPI_Send(pixels, 3 * width * height, MPI_FLOAT, 0, MPI_BUFFER_TAG, MPI_COMM_WORLD);
 }

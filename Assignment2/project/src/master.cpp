@@ -133,7 +133,15 @@ void masterStaticStripsHorizontal(ConfigData* data, float* pixels)
     int rank = data->mpi_rank;
     int procs = data->mpi_procs;
     float strip_width = width/procs;
-    float proc_comp_time[procs];
+    double slave_time[procs];
+
+    /*
+    if(strip_width != (int)strip_width)
+    {
+        std::cout << "Nodes cannot evenly divide image!" << std::endl;
+        MPI_Abort(MPI_COMM_WORLD, -1);
+    }
+    */
 
     clock_t start = clock();
 
@@ -152,17 +160,15 @@ void masterStaticStripsHorizontal(ConfigData* data, float* pixels)
         }
     }
 
-    //Stop the timing.
-    clock_t stop = clock();
-    proc_comp_time[0] = ((float)stop - (float)start) / CLOCKS_PER_SEC;
-
     /* Recieve slave process computations */
     for(int p = 1; p < procs; ++p)
     {
         float* newpixels = new float[3 * width * height + 1];
 
         MPI_Status status;
-        MPI_Recv(newpixels, 3 * width * height + 1, MPI_FLOAT, p, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+        MPI_Recv(newpixels, 3 * width * height, MPI_FLOAT, p, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+        slave_time[p] = newpixels[3 * width * height];
+        
         for( int col = ceil(strip_width) * p; col < floor(strip_width) * (p + 1); ++col )
         {
             for( int row = 0; row < height; ++row )
@@ -172,15 +178,18 @@ void masterStaticStripsHorizontal(ConfigData* data, float* pixels)
             }
         }
 
-        proc_comp_time[p] = newpixels[3 * width * height];
-
         delete[] newpixels;
     }
 
-    // Output how much time was taken
-    for (int j = 0; j < procs; j++)
-    {
-        std::cout<< "Execution Time for " << j << ": " << proc_comp_time[j] << " seconds" << std::endl << std::endl;
+    
+    //Stop the timing.
+    clock_t stop = clock();
+
+    //Figure out how much time was taken.
+    float time = (float)(stop - start) / (float)CLOCKS_PER_SEC;
+    std::cout << "Execution Time: " << time << " seconds" << std::endl << std::endl;
+    for (int j = 1; j < procs; j++){
+        std::cout<< "Execution Time: " << slave_time[j] << " seconds" << std::endl << std::endl;
     }
 }
 
@@ -192,8 +201,17 @@ void masterStaticBlock(ConfigData* data, float* pixels){
     int factor = sqrt(procs);
     float block_width = width/procs * factor;
     float block_height = height/procs * factor;
+    double slave_time[procs];
+    
+    /*
+    if(block_width != (int)block_width || block_height != (int)block_height)
+    {
+        std::cout << "Nodes cannot evenly divide image!" << std::endl;
+        MPI_Abort(MPI_COMM_WORLD, -1);
+    }
+    */
 
-    //clock_t start = clock();
+    clock_t start = clock();
     
     /* Render the scene. */
     // Iterate over rows for this partition
@@ -213,11 +231,12 @@ void masterStaticBlock(ConfigData* data, float* pixels){
     /* Recieve slave process computations */
     for(int p = 1; p < procs; ++p)
     {
-        float* newpixels = new float[3 * width * height];
+        float* newpixels = new float[3 * width * height + 1];
 
         MPI_Status status;
         MPI_Recv(newpixels, 3 * width * height, MPI_FLOAT, p, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
-
+        slave_time[p] = newpixels[3 * width * height];
+        
         for( int col = (ceil(block_width) * (p % factor) ); col < (floor(block_width) * ((p % factor) + 1)); ++col )
         {
             for( int row = (ceil(block_height) * floor(p/factor) ); row < (floor(block_height) * (floor(p/factor) + 1)); ++row )
@@ -230,6 +249,16 @@ void masterStaticBlock(ConfigData* data, float* pixels){
         delete[] newpixels;
     }
     
+    //Stop the timing.
+    clock_t stop = clock();
+
+    //Figure out how much time was taken.
+    float time = (float)(stop - start) / (float)CLOCKS_PER_SEC;
+    std::cout << "Execution Time: " << time << " seconds" << std::endl << std::endl;
+    for (int j = 1; j < procs; j++){
+        std::cout<< "Execution Time: " << slave_time[j] << " seconds" << std::endl << std::endl;
+    }
+    
 }
 
 void masterStaticCyclesVertical(ConfigData* data, float* pixels)
@@ -239,6 +268,9 @@ void masterStaticCyclesVertical(ConfigData* data, float* pixels)
     int rank = data->mpi_rank;
     int procs = data->mpi_procs;
     int cycle_height = data->cycleSize;
+    double slave_time[procs];
+    
+    clock_t start = clock();
 
     // Process for this node
     for(int part = rank * cycle_height; part < height; part += (procs * cycle_height))
@@ -259,10 +291,11 @@ void masterStaticCyclesVertical(ConfigData* data, float* pixels)
     
     for(int p = 1; p < procs; ++p)
     {
-        float* newpixels = new float[3 * width * height];
+        float* newpixels = new float[3 * width * height + 1];
 
         MPI_Status status;
         MPI_Recv(newpixels, 3 * width * height, MPI_FLOAT, p, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+        slave_time[p] = newpixels[3 * width * height];
 
         for(int part = p * cycle_height; part < height; part += (procs * cycle_height))
         {
@@ -278,6 +311,18 @@ void masterStaticCyclesVertical(ConfigData* data, float* pixels)
         }
 
         delete[] newpixels;
+        
+    }
+    
+    
+    //Stop the timing.
+    clock_t stop = clock();
+
+    //Figure out how much time was taken.
+    float time = (float)(stop - start) / (float)CLOCKS_PER_SEC;
+    std::cout << "Execution Time: " << time << " seconds" << std::endl << std::endl;
+    for (int j = 1; j < procs; j++){
+        std::cout<< "Execution Time: " << slave_time[j] << " seconds" << std::endl << std::endl;
     }
     
 }
