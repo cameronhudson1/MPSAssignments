@@ -111,54 +111,49 @@ void masterSequential(ConfigData* data, float* pixels)
 
     //Stop the comp. timer
     double computationStop = MPI_Wtime();
-    double computationTime = computationStop - computationStart;
+    float computationTime = (float)computationStop - (float)computationStart;
 
     //After receiving from all processes, the communication time will
     //be obtained.
-    double communicationTime = 0.0;
+    float communicationTime = 0.0;
 
     //Print the times and the c-to-c ratio
 	//This section of printing, IN THIS ORDER, needs to be included in all of the
 	//functions that you write at the end of the function.
     std::cout << "Total Computation Time: " << computationTime << " seconds" << std::endl;
     std::cout << "Total Communication Time: " << communicationTime << " seconds" << std::endl;
-    //double c2cRatio = communicationTime / computationTime;
-    //std::cout << "C-to-C Ratio: " << c2cRatio << std::endl;
+    float c2cRatio = communicationTime / computationTime;
+    std::cout << "C-to-C Ratio: " << c2cRatio << std::endl;
 }
 
 void masterStaticStripsHorizontal(ConfigData* data, float* pixels)
 {
+    // Init Variables
     int height = data->height;
     int width = data->width;
     int rank = data->mpi_rank;
     int procs = data->mpi_procs;
     float strip_width = width/procs;
-    double slave_time[procs];
 
-    /*
-    if(strip_width != (int)strip_width)
-    {
-        std::cout << "Nodes cannot evenly divide image!" << std::endl;
-        MPI_Abort(MPI_COMM_WORLD, -1);
-    }
-    */
-
-    clock_t start = clock();
+    // Start computation timer
+    double computationStart = MPI_Wtime();
 
     /* Render the scene. */
-    // Iterate over rows for this partition
     for( int col = ( floor(strip_width) * rank ); col < ( ceil(strip_width) * (rank + 1) ); ++col )
     {
-        // Iterate over all cols (strips span width)
         for( int row = 0; row < height; ++row )
         {
-            //Calculate the index into the array.
             int baseIndex = 3 * ( row * width + col );
-
-            //Call the function to shade the pixel.
             shadePixel(&(pixels[baseIndex]), row, col, data);
         }
     }
+
+    //Stop computation timer
+    double computationStop = MPI_Wtime();
+    float computationTime = (float)computationStop - (float)computationStart;
+
+    // Start communication timer
+    double communicationStart = MPI_Wtime();
 
     /* Recieve slave process computations */
     for(int p = 1; p < procs; ++p)
@@ -167,8 +162,11 @@ void masterStaticStripsHorizontal(ConfigData* data, float* pixels)
 
         MPI_Status status;
         MPI_Recv(newpixels, 3 * width * height, MPI_FLOAT, p, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
-        slave_time[p] = newpixels[3 * width * height];
+
+        // After recieving the buffer, the last element will be the slaves communication time
+        computationTime += newpixels[3*width*height];
         
+        // Copy the new data into the master pixel array
         for( int col = ceil(strip_width) * p; col < floor(strip_width) * (p + 1); ++col )
         {
             for( int row = 0; row < height; ++row )
@@ -181,16 +179,15 @@ void masterStaticStripsHorizontal(ConfigData* data, float* pixels)
         delete[] newpixels;
     }
 
-    
-    //Stop the timing.
-    clock_t stop = clock();
+    //Stop communication timer
+    double communicationStop = MPI_Wtime();
+    float communicationTime = (float)communicationStop - (float)communicationStart;
 
-    //Figure out how much time was taken.
-    float time = (float)(stop - start) / (float)CLOCKS_PER_SEC;
-    std::cout << "Execution Time: " << time << " seconds" << std::endl << std::endl;
-    for (int j = 1; j < procs; j++){
-        std::cout<< "Execution Time: " << slave_time[j] << " seconds" << std::endl << std::endl;
-    }
+    //Print the times and the c-to-c ratio
+    std::cout << "Total Computation Time: " << computationTime << " seconds" << std::endl;
+    std::cout << "Total Communication Time: " << communicationTime << " seconds" << std::endl;
+    float c2cRatio = communicationTime / computationTime;
+    std::cout << "C-to-C Ratio: " << c2cRatio << std::endl;
 }
 
 void masterStaticBlock(ConfigData* data, float* pixels){
@@ -201,32 +198,26 @@ void masterStaticBlock(ConfigData* data, float* pixels){
     int factor = sqrt(procs);
     float block_width = width/procs * factor;
     float block_height = height/procs * factor;
-    double slave_time[procs];
-    
-    /*
-    if(block_width != (int)block_width || block_height != (int)block_height)
-    {
-        std::cout << "Nodes cannot evenly divide image!" << std::endl;
-        MPI_Abort(MPI_COMM_WORLD, -1);
-    }
-    */
 
-    clock_t start = clock();
+    // Start computation timer
+    double computationStart = MPI_Wtime();
     
     /* Render the scene. */
-    // Iterate over rows for this partition
     for( int col = (floor(block_width) * (rank % factor) ); col < (ceil(block_width) * ((rank % factor) + 1)); ++col )
     {
-        // Iterate over all cols (strips span width)
         for( int row = (floor(block_height) * floor(rank/factor) ); row < (ceil(block_height) * (floor(rank/factor) + 1)); ++row )
         {
-            //Calculate the index into the array.
             int baseIndex = 3 * ( row * width + col );
-
-            //Call the function to shade the pixel.
             shadePixel(&(pixels[baseIndex]), row, col, data);
         }
     }
+
+    //Stop computation timer
+    double computationStop = MPI_Wtime();
+    float computationTime = (float)computationStop - (float)computationStart;
+
+    // Start communication timer
+    double communicationStart = MPI_Wtime();
 
     /* Recieve slave process computations */
     for(int p = 1; p < procs; ++p)
@@ -235,7 +226,9 @@ void masterStaticBlock(ConfigData* data, float* pixels){
 
         MPI_Status status;
         MPI_Recv(newpixels, 3 * width * height, MPI_FLOAT, p, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
-        slave_time[p] = newpixels[3 * width * height];
+
+        // After recieving the buffer, the last element will be the slaves communication time
+        computationTime += newpixels[3*width*height];
         
         for( int col = (ceil(block_width) * (p % factor) ); col < (floor(block_width) * ((p % factor) + 1)); ++col )
         {
@@ -249,15 +242,15 @@ void masterStaticBlock(ConfigData* data, float* pixels){
         delete[] newpixels;
     }
     
-    //Stop the timing.
-    clock_t stop = clock();
+    //Stop communication timer
+    double communicationStop = MPI_Wtime();
+    float communicationTime = (float)communicationStop - (float)communicationStart;
 
-    //Figure out how much time was taken.
-    float time = (float)(stop - start) / (float)CLOCKS_PER_SEC;
-    std::cout << "Execution Time: " << time << " seconds" << std::endl << std::endl;
-    for (int j = 1; j < procs; j++){
-        std::cout<< "Execution Time: " << slave_time[j] << " seconds" << std::endl << std::endl;
-    }
+    //Print the times and the c-to-c ratio
+    std::cout << "Total Computation Time: " << computationTime << " seconds" << std::endl;
+    std::cout << "Total Communication Time: " << communicationTime << " seconds" << std::endl;
+    float c2cRatio = communicationTime / computationTime;
+    std::cout << "C-to-C Ratio: " << c2cRatio << std::endl;
     
 }
 
@@ -270,9 +263,10 @@ void masterStaticCyclesVertical(ConfigData* data, float* pixels)
     int cycle_height = data->cycleSize;
     double slave_time[procs];
     
-    clock_t start = clock();
+    // Start computation timer
+    double computationStart = MPI_Wtime();
 
-    // Process for this node
+    /* Render the scene. */
     for(int part = rank * cycle_height; part < height; part += (procs * cycle_height))
     {
         for(int col = 0; col < width; ++col)
@@ -288,14 +282,23 @@ void masterStaticCyclesVertical(ConfigData* data, float* pixels)
         }
     }
 
-    
+    //Stop computation timer
+    double computationStop = MPI_Wtime();
+    float computationTime = (float)computationStop - (float)computationStart;
+
+    // Start communication timer
+    double communicationStart = MPI_Wtime();
+
+    /* Recieve slave process computations */
     for(int p = 1; p < procs; ++p)
     {
         float* newpixels = new float[3 * width * height + 1];
 
         MPI_Status status;
         MPI_Recv(newpixels, 3 * width * height, MPI_FLOAT, p, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
-        slave_time[p] = newpixels[3 * width * height];
+        
+        // After recieving the buffer, the last element will be the slaves communication time
+        computationTime += newpixels[3*width*height];
 
         for(int part = p * cycle_height; part < height; part += (procs * cycle_height))
         {
@@ -303,26 +306,21 @@ void masterStaticCyclesVertical(ConfigData* data, float* pixels)
             {
                 for(int row = part; row < (part + cycle_height >= height ? height : part + cycle_height); ++row)
                 {
-                    //Calculate the index into the array.
                     int baseIndex = 3 * ( row * width + col );
                     memcpy(&(pixels[baseIndex]), &(newpixels[baseIndex]), 3*sizeof(float));
                 }
             }
         }
-
         delete[] newpixels;
-        
     }
     
-    
-    //Stop the timing.
-    clock_t stop = clock();
+    //Stop communication timer
+    double communicationStop = MPI_Wtime();
+    float communicationTime = (float)communicationStop - (float)communicationStart;
 
-    //Figure out how much time was taken.
-    float time = (float)(stop - start) / (float)CLOCKS_PER_SEC;
-    std::cout << "Execution Time: " << time << " seconds" << std::endl << std::endl;
-    for (int j = 1; j < procs; j++){
-        std::cout<< "Execution Time: " << slave_time[j] << " seconds" << std::endl << std::endl;
-    }
-    
+    //Print the times and the c-to-c ratio
+    std::cout << "Total Computation Time: " << computationTime << " seconds" << std::endl;
+    std::cout << "Total Communication Time: " << communicationTime << " seconds" << std::endl;
+    float c2cRatio = communicationTime / computationTime;
+    std::cout << "C-to-C Ratio: " << c2cRatio << std::endl;
 }

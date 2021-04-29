@@ -67,10 +67,9 @@ void slaveStaticStripsHorizontal(ConfigData* data, float* pixels)
     int procs = data->mpi_procs;
     float strip_width = width/procs;
 
-    //start time
-    clock_t comp_start, comp_stop;
-    float comp_time;
-    comp_start = clock();
+    // Start computation timer
+    double computationStart = MPI_Wtime();
+
     // Iterate over rows for this partition
     for( int col = ( ceil(strip_width) * rank ); col < ( floor(strip_width) * (rank + 1) ); ++col )
     {
@@ -84,12 +83,13 @@ void slaveStaticStripsHorizontal(ConfigData* data, float* pixels)
             shadePixel(&(pixels[baseIndex]), row, col, data);
         }
     }
-    //end time
-    comp_stop = clock();
-    comp_time = ((float)comp_stop - (float)comp_start) / CLOCKS_PER_SEC;
     
-    //tack on the end
-    pixels[3 * data->width * data->height] = comp_time;
+    // Stop computation timer
+    double computationStop = MPI_Wtime();
+    float computationTime = (float)computationStop - (float)computationStart;
+    
+    // Add computation time to the end of the buffer
+    pixels[3 * data->width * data->height] = computationTime;
     
     MPI_Send(pixels, 3 * width * height + 1, MPI_FLOAT, 0, MPI_BUFFER_TAG, MPI_COMM_WORLD);
 }
@@ -103,10 +103,8 @@ void slaveStaticBlock(ConfigData* data, float* pixels){
     float block_width = (width/procs) * factor;
     float block_height = (height/procs) * factor;
     
-    //start time
-    clock_t comp_start, comp_stop;
-    float comp_time;
-    comp_start = clock();
+    // Start computation timer
+    double computationStart = MPI_Wtime();
     
     for( int col = (ceil(block_width) * (rank % factor) ); col < (floor(block_width) * ((rank % factor) + 1) ); ++col ){
         // Iterate over all cols (strips span width)
@@ -119,12 +117,12 @@ void slaveStaticBlock(ConfigData* data, float* pixels){
         }
     }
     
-    //end time
-    comp_stop = clock();
-    comp_time = ((float)comp_stop - (float)comp_start) / CLOCKS_PER_SEC;
+    // Stop computation timer
+    double computationStop = MPI_Wtime();
+    float computationTime = (float)computationStop - (float)computationStart;
     
-    //tack on the end
-    pixels[3 * data->width * data->height] = comp_time;
+    // Add computation time to the end of the buffer
+    pixels[3 * data->width * data->height] = computationTime;
 
     MPI_Send(pixels, 3 * width * height, MPI_FLOAT, 0, MPI_BUFFER_TAG, MPI_COMM_WORLD);
 }
@@ -137,10 +135,8 @@ void slaveStaticCyclesVertical(ConfigData* data, float* pixels)
     int procs = data->mpi_procs;
     int cycle_height = data->cycleSize;
     
-    //start time
-    clock_t comp_start, comp_stop;
-    float comp_time;
-    comp_start = clock();
+    // Start computation timer
+    double computationStart = MPI_Wtime();
 
     // Process for this node
     for(int part = rank * cycle_height; part < height; part += (procs * cycle_height))
@@ -158,12 +154,12 @@ void slaveStaticCyclesVertical(ConfigData* data, float* pixels)
         }
     }
     
-    //end time
-    comp_stop = clock();
-    comp_time = ((float)comp_stop - (float)comp_start) / CLOCKS_PER_SEC;
+    // Stop computation timer
+    double computationStop = MPI_Wtime();
+    float computationTime = (float)computationStop - (float)computationStart;
     
-    //tack on the end
-    pixels[3 * data->width * data->height] = comp_time;
+    // Add computation time to the end of the buffer
+    pixels[3 * data->width * data->height] = computationTime;
 
     MPI_Send(pixels, 3 * width * height, MPI_FLOAT, 0, MPI_BUFFER_TAG, MPI_COMM_WORLD);
 }
